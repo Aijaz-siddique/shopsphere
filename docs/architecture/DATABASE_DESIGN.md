@@ -2,47 +2,47 @@ Absolutely. I consolidated the review changes and did a final consistency pass a
 
 
 
-Below is the \*\*complete revised `DATABASE\_DESIGN.md`\*\*. Replace the entire file with this version.
+Below is the **complete revised `DATABASE_DESIGN.md`**. Replace the entire file with this version.
 
 
 
 ````markdown
 
-\# ShopSphere
+# ShopSphere
 
-\## Product Service Database Design
-
-
-
-\*\*Document Version:\*\* 1.1  
-
-\*\*Status:\*\* Draft  
-
-\*\*Database:\*\* PostgreSQL 17  
-
-\*\*Related Documents:\*\*
-
-\- `docs/product-service/BRD.md`
-
-\- `docs/product-service/FRD.md`
-
-\- `docs/product-service/DOMAIN\_MODEL.md`
-
-\- `docs/architecture/HLD.md`
-
-\- `docs/architecture/API\_DESIGN.md`
+## Product Service Database Design
 
 
 
-\*\*Last Updated:\*\* 2026-08-23
+**Document Version:** 1.1  
+
+**Status:** Draft  
+
+**Database:** PostgreSQL 17  
+
+**Related Documents:**
+
+- `docs/product-service/BRD.md`
+
+- `docs/product-service/FRD.md`
+
+- `docs/product-service/DOMAIN_MODEL.md`
+
+- `docs/architecture/HLD.md`
+
+- `docs/architecture/API_DESIGN.md`
 
 
 
-\---
+**Last Updated:** 2026-08-23
 
 
 
-\# 1. Purpose
+---
+
+
+
+# 1. Purpose
 
 
 
@@ -54,33 +54,33 @@ It covers:
 
 
 
-\- Database structure
+- Database structure
 
-\- Tables
+- Tables
 
-\- Columns
+- Columns
 
-\- Data types
+- Data types
 
-\- Primary keys
+- Primary keys
 
-\- Foreign keys
+- Foreign keys
 
-\- Unique constraints
+- Unique constraints
 
-\- Check constraints
+- Check constraints
 
-\- Indexes
+- Indexes
 
-\- Audit fields
+- Audit fields
 
-\- Product lifecycle persistence
+- Product lifecycle persistence
 
-\- Transaction boundaries
+- Transaction boundaries
 
-\- Database migration strategy
+- Database migration strategy
 
-\- Transactional outbox persistence
+- Transactional outbox persistence
 
 
 
@@ -88,11 +88,11 @@ The database design must support the approved Product Service API and Domain Mod
 
 
 
-\---
+---
 
 
 
-\# 2. Database Principles
+# 2. Database Principles
 
 
 
@@ -100,37 +100,37 @@ The Product Service database follows these principles:
 
 
 
-1\. PostgreSQL is the system of record for Product data.
+1. PostgreSQL is the system of record for Product data.
 
-2\. Database constraints enforce critical persistence invariants.
+2. Database constraints enforce critical persistence invariants.
 
-3\. Database schema is managed through versioned migrations.
+3. Database schema is managed through versioned migrations.
 
-4\. Foreign keys are used only where the referenced data is owned by the Product Service.
+4. Foreign keys are used only where the referenced data is owned by the Product Service.
 
-5\. Monetary values use exact numeric types rather than floating-point types.
+5. Monetary values use exact numeric types rather than floating-point types.
 
-6\. Timestamps are stored consistently using timezone-aware PostgreSQL types.
+6. Timestamps are stored consistently using timezone-aware PostgreSQL types.
 
-7\. Application/domain models are separate from persistence models.
+7. Application/domain models are separate from persistence models.
 
-8\. Physical deletion of Products is not supported initially.
+8. Physical deletion of Products is not supported initially.
 
-9\. Indexes are introduced based on actual query requirements.
+9. Indexes are introduced based on actual query requirements.
 
-10\. Database changes should be backward-compatible where practical.
+10. Database changes should be backward-compatible where practical.
 
-11\. Event publication uses the transactional outbox pattern.
+11. Event publication uses the transactional outbox pattern.
 
-12\. Database credentials and secrets are never stored in source control.
-
-
-
-\---
+12. Database credentials and secrets are never stored in source control.
 
 
 
-\# 3. Database Name
+---
+
+
+
+# 3. Database Name
 
 
 
@@ -180,11 +180,11 @@ Production database configuration will be environment-specific.
 
 
 
-\---
+---
 
 
 
-\# 4. PostgreSQL Schema
+# 4. PostgreSQL Schema
 
 
 
@@ -206,7 +206,7 @@ shopsphere
 
 &#x20;        ├── products
 
-&#x20;        └── outbox\_events
+&#x20;        └── outbox_events
 
 ```
 
@@ -216,11 +216,11 @@ A dedicated application schema may be introduced later if required by the deploy
 
 
 
-\---
+---
 
 
 
-\# 5. Entity Overview
+# 5. Entity Overview
 
 
 
@@ -232,7 +232,7 @@ Initial tables:
 
 products
 
-outbox\_events
+outbox_events
 
 ```
 
@@ -262,15 +262,15 @@ Conceptual relationship:
 
 │ currency            │
 
-│ category\_id         │
+│ category_id         │
 
-│ brand\_id            │
+│ brand_id            │
 
 │ status              │
 
-│ created\_at          │
+│ created_at          │
 
-│ updated\_at          │
+│ updated_at          │
 
 └──────────┬──────────┘
 
@@ -282,23 +282,23 @@ Conceptual relationship:
 
 ┌─────────────────────┐
 
-│    outbox\_events    │
+│    outbox_events    │
 
 ├─────────────────────┤
 
 │ id                  │
 
-│ aggregate\_type      │
+│ aggregate_type      │
 
-│ aggregate\_id        │
+│ aggregate_id        │
 
-│ event\_type          │
+│ event_type          │
 
 │ payload             │
 
-│ created\_at          │
+│ created_at          │
 
-│ published\_at        │
+│ published_at        │
 
 └─────────────────────┘
 
@@ -306,15 +306,15 @@ Conceptual relationship:
 
 
 
-`outbox\_events` does not use a database foreign key to `products` because the outbox represents events and must remain independently processable.
+`outbox_events` does not use a database foreign key to `products` because the outbox represents events and must remain independently processable.
 
 
 
-\---
+---
 
 
 
-\# 6. Products Table
+# 6. Products Table
 
 
 
@@ -338,11 +338,11 @@ Stores the authoritative Product state.
 
 
 
-\---
+---
 
 
 
-\# 7. Products Table Definition
+# 7. Products Table Definition
 
 
 
@@ -366,23 +366,23 @@ Logical structure:
 
 | currency    | varchar(3)      |       No | Currency code              |
 
-| category\_id | varchar(26)     |      Yes | Logical Category reference |
+| category_id | varchar(26)     |      Yes | Logical Category reference |
 
-| brand\_id    | varchar(26)     |      Yes | Logical Brand reference    |
+| brand_id    | varchar(26)     |      Yes | Logical Brand reference    |
 
 | status      | varchar(20)     |       No | Product lifecycle state    |
 
-| created\_at  | timestamptz     |       No | Creation timestamp         |
+| created_at  | timestamptz     |       No | Creation timestamp         |
 
-| updated\_at  | timestamptz     |       No | Last update timestamp      |
-
-
-
-\---
+| updated_at  | timestamptz     |       No | Last update timestamp      |
 
 
 
-\# 8. Product ID
+---
+
+
+
+# 8. Product ID
 
 
 
@@ -418,15 +418,15 @@ Benefits:
 
 
 
-\* Globally unique
+* Globally unique
 
-\* Suitable for distributed systems
+* Suitable for distributed systems
 
-\* Time-sortable
+* Time-sortable
 
-\* Does not expose database sequence counts
+* Does not expose database sequence counts
 
-\* Can be generated independently by application instances
+* Can be generated independently by application instances
 
 
 
@@ -446,11 +446,11 @@ The database should treat the identifier as an opaque value.
 
 
 
-\---
+---
 
 
 
-\# 9. SKU
+# 9. SKU
 
 
 
@@ -506,11 +506,11 @@ SKU normalization and case-sensitivity rules will be finalized during implementa
 
 
 
-\---
+---
 
 
 
-\# 10. Product Name
+# 10. Product Name
 
 
 
@@ -530,11 +530,11 @@ Rules:
 
 
 
-\* Must not be null
+* Must not be null
 
-\* Must not be blank
+* Must not be blank
 
-\* Maximum length: 255 characters
+* Maximum length: 255 characters
 
 
 
@@ -542,11 +542,11 @@ Application validation should reject blank values before persistence.
 
 
 
-\---
+---
 
 
 
-\# 11. Description
+# 11. Description
 
 
 
@@ -574,11 +574,11 @@ Application-level limits may be introduced if required by functional requirement
 
 
 
-\---
+---
 
 
 
-\# 12. Price
+# 12. Price
 
 
 
@@ -650,11 +650,11 @@ CHECK (price >= 0)
 
 
 
-\---
+---
 
 
 
-\# 13. Currency
+# 13. Currency
 
 
 
@@ -704,11 +704,11 @@ This avoids requiring a schema migration whenever the supported currency set cha
 
 
 
-\---
+---
 
 
 
-\# 14. Category Reference
+# 14. Category Reference
 
 
 
@@ -718,7 +718,7 @@ Column:
 
 ```text
 
-category\_id varchar(26)
+category_id varchar(26)
 
 ```
 
@@ -738,7 +738,7 @@ Therefore:
 
 ```text
 
-category\_id
+category_id
 
 ```
 
@@ -752,11 +752,11 @@ No database foreign key will be created until the ownership boundary is establis
 
 
 
-\---
+---
 
 
 
-\# 15. Brand Reference
+# 15. Brand Reference
 
 
 
@@ -766,7 +766,7 @@ Column:
 
 ```text
 
-brand\_id varchar(26)
+brand_id varchar(26)
 
 ```
 
@@ -786,7 +786,7 @@ Therefore:
 
 ```text
 
-brand\_id
+brand_id
 
 ```
 
@@ -800,11 +800,11 @@ No database foreign key will be created until the ownership boundary is establis
 
 
 
-\---
+---
 
 
 
-\# 16. Product Status
+# 16. Product Status
 
 
 
@@ -892,11 +892,11 @@ That decision belongs to the domain model.
 
 
 
-\---
+---
 
 
 
-\# 17. Timestamps
+# 17. Timestamps
 
 
 
@@ -906,9 +906,9 @@ The Product table contains:
 
 ```text
 
-created\_at timestamptz NOT NULL
+created_at timestamptz NOT NULL
 
-updated\_at timestamptz NOT NULL
+updated_at timestamptz NOT NULL
 
 ```
 
@@ -942,11 +942,11 @@ The exact timestamp-generation strategy will be finalized during implementation.
 
 
 
-\---
+---
 
 
 
-\# 18. Product Table Example
+# 18. Product Table Example
 
 
 
@@ -976,9 +976,9 @@ CREATE TABLE products (
 
 
 
-&#x20;   category\_id VARCHAR(26),
+&#x20;   category_id VARCHAR(26),
 
-&#x20;   brand\_id VARCHAR(26),
+&#x20;   brand_id VARCHAR(26),
 
 
 
@@ -986,25 +986,25 @@ CREATE TABLE products (
 
 
 
-&#x20;   created\_at TIMESTAMPTZ NOT NULL,
+&#x20;   created_at TIMESTAMPTZ NOT NULL,
 
-&#x20;   updated\_at TIMESTAMPTZ NOT NULL,
+&#x20;   updated_at TIMESTAMPTZ NOT NULL,
 
 
 
-&#x20;   CONSTRAINT uk\_products\_sku
+&#x20;   CONSTRAINT uk_products_sku
 
 &#x20;       UNIQUE (sku),
 
 
 
-&#x20;   CONSTRAINT ck\_products\_price
+&#x20;   CONSTRAINT ck_products_price
 
 &#x20;       CHECK (price >= 0),
 
 
 
-&#x20;   CONSTRAINT ck\_products\_status
+&#x20;   CONSTRAINT ck_products_status
 
 &#x20;       CHECK (
 
@@ -1036,15 +1036,15 @@ The actual database schema will be created through versioned migrations.
 
 
 
-\---
+---
 
 
 
-\# 19. Index Strategy
+# 19. Index Strategy
 
 
 
-Indexes are based on the API access patterns defined in `API\_DESIGN.md`.
+Indexes are based on the API access patterns defined in `API_DESIGN.md`.
 
 
 
@@ -1074,9 +1074,9 @@ Initial filtering indexes:
 
 status
 
-category\_id
+category_id
 
-brand\_id
+brand_id
 
 ```
 
@@ -1090,11 +1090,11 @@ Every additional index has:
 
 
 
-\* Storage cost
+* Storage cost
 
-\* Insert/update cost
+* Insert/update cost
 
-\* Maintenance cost
+* Maintenance cost
 
 
 
@@ -1102,11 +1102,11 @@ Additional indexes will be introduced based on actual query performance.
 
 
 
-\---
+---
 
 
 
-\# 20. Initial Product Indexes
+# 20. Initial Product Indexes
 
 
 
@@ -1116,21 +1116,21 @@ Conceptual SQL:
 
 ```sql
 
-CREATE INDEX idx\_products\_status
+CREATE INDEX idx_products_status
 
 &#x20;   ON products(status);
 
 
 
-CREATE INDEX idx\_products\_category\_id
+CREATE INDEX idx_products_category_id
 
-&#x20;   ON products(category\_id);
+&#x20;   ON products(category_id);
 
 
 
-CREATE INDEX idx\_products\_brand\_id
+CREATE INDEX idx_products_brand_id
 
-&#x20;   ON products(brand\_id);
+&#x20;   ON products(brand_id);
 
 ```
 
@@ -1140,7 +1140,7 @@ The unique SKU constraint automatically provides an index suitable for SKU looku
 
 
 
-Indexes on `created\_at` and `updated\_at` are intentionally not mandatory in the first migration.
+Indexes on `created_at` and `updated_at` are intentionally not mandatory in the first migration.
 
 
 
@@ -1148,11 +1148,11 @@ They may be added later if query plans and performance testing justify them.
 
 
 
-\---
+---
 
 
 
-\# 21. Pagination and Indexing
+# 21. Pagination and Indexing
 
 
 
@@ -1162,7 +1162,7 @@ The API supports page-based pagination:
 
 ```text
 
-GET /api/v1/products?page=0\&size=20
+GET /api/v1/products?page=0&size=20
 
 ```
 
@@ -1184,11 +1184,11 @@ This is intentionally deferred.
 
 
 
-\---
+---
 
 
 
-\# 22. Search
+# 22. Search
 
 
 
@@ -1216,21 +1216,21 @@ A dedicated search engine will only be introduced if:
 
 
 
-\* Search requirements become significantly more complex
+* Search requirements become significantly more complex
 
-\* PostgreSQL search performance becomes insufficient
+* PostgreSQL search performance becomes insufficient
 
-\* Relevance/ranking requirements justify it
+* Relevance/ranking requirements justify it
 
-\* Product catalog scale requires it
-
-
-
-\---
+* Product catalog scale requires it
 
 
 
-\# 23. Soft Delete
+---
+
+
+
+# 23. Soft Delete
 
 
 
@@ -1240,7 +1240,7 @@ The Product table will not initially contain:
 
 ```text
 
-deleted\_at
+deleted_at
 
 ```
 
@@ -1272,11 +1272,11 @@ Physical deletion is not part of the initial Product API.
 
 
 
-\---
+---
 
 
 
-\# 24. Database Constraints
+# 24. Database Constraints
 
 
 
@@ -1312,11 +1312,11 @@ Database constraints provide the final protection against invalid persistence.
 
 
 
-\---
+---
 
 
 
-\# 25. Transaction Boundaries
+# 25. Transaction Boundaries
 
 
 
@@ -1368,11 +1368,11 @@ Neither the Product change nor its corresponding Outbox event should be committe
 
 
 
-\---
+---
 
 
 
-\# 26. Transactional Outbox
+# 26. Transactional Outbox
 
 
 
@@ -1444,11 +1444,11 @@ This ensures the Product state change and pending event are committed atomically
 
 
 
-\---
+---
 
 
 
-\# 27. Outbox Events Table
+# 27. Outbox Events Table
 
 
 
@@ -1458,7 +1458,7 @@ Table:
 
 ```text
 
-outbox\_events
+outbox_events
 
 ```
 
@@ -1474,25 +1474,25 @@ Logical structure:
 
 | id             | varchar(26)     |       No | Event identifier      |
 
-| aggregate\_type | varchar(100)    |       No | Aggregate type        |
+| aggregate_type | varchar(100)    |       No | Aggregate type        |
 
-| aggregate\_id   | varchar(26)     |       No | Product identifier    |
+| aggregate_id   | varchar(26)     |       No | Product identifier    |
 
-| event\_type     | varchar(150)    |       No | Event name            |
+| event_type     | varchar(150)    |       No | Event name            |
 
 | payload        | jsonb           |       No | Serialized event      |
 
-| created\_at     | timestamptz     |       No | Event creation time   |
+| created_at     | timestamptz     |       No | Event creation time   |
 
-| published\_at   | timestamptz     |      Yes | Publication timestamp |
-
-
-
-\---
+| published_at   | timestamptz     |      Yes | Publication timestamp |
 
 
 
-\# 28. Outbox Table Example
+---
+
+
+
+# 28. Outbox Table Example
 
 
 
@@ -1502,19 +1502,19 @@ Conceptual SQL:
 
 ```sql
 
-CREATE TABLE outbox\_events (
+CREATE TABLE outbox_events (
 
 &#x20;   id VARCHAR(26) PRIMARY KEY,
 
 
 
-&#x20;   aggregate\_type VARCHAR(100) NOT NULL,
+&#x20;   aggregate_type VARCHAR(100) NOT NULL,
 
-&#x20;   aggregate\_id VARCHAR(26) NOT NULL,
+&#x20;   aggregate_id VARCHAR(26) NOT NULL,
 
 
 
-&#x20;   event\_type VARCHAR(150) NOT NULL,
+&#x20;   event_type VARCHAR(150) NOT NULL,
 
 
 
@@ -1522,9 +1522,9 @@ CREATE TABLE outbox\_events (
 
 
 
-&#x20;   created\_at TIMESTAMPTZ NOT NULL,
+&#x20;   created_at TIMESTAMPTZ NOT NULL,
 
-&#x20;   published\_at TIMESTAMPTZ
+&#x20;   published_at TIMESTAMPTZ
 
 );
 
@@ -1536,11 +1536,11 @@ The exact event payload and event contract will be defined as part of the event 
 
 
 
-\---
+---
 
 
 
-\# 29. Outbox Publisher Query
+# 29. Outbox Publisher Query
 
 
 
@@ -1554,13 +1554,13 @@ Conceptual query:
 
 ```sql
 
-SELECT \*
+SELECT *
 
-FROM outbox\_events
+FROM outbox_events
 
-WHERE published\_at IS NULL
+WHERE published_at IS NULL
 
-ORDER BY created\_at;
+ORDER BY created_at;
 
 ```
 
@@ -1572,11 +1572,11 @@ A partial index should support this query:
 
 ```sql
 
-CREATE INDEX idx\_outbox\_events\_unpublished
+CREATE INDEX idx_outbox_events_unpublished
 
-&#x20;   ON outbox\_events(created\_at)
+&#x20;   ON outbox_events(created_at)
 
-&#x20;   WHERE published\_at IS NULL;
+&#x20;   WHERE published_at IS NULL;
 
 ```
 
@@ -1586,11 +1586,11 @@ This index intentionally excludes already-published events.
 
 
 
-\---
+---
 
 
 
-\# 30. Outbox Processing
+# 30. Outbox Processing
 
 
 
@@ -1600,7 +1600,7 @@ The Outbox Publisher identifies unpublished events:
 
 ```text
 
-published\_at IS NULL
+published_at IS NULL
 
 ```
 
@@ -1610,13 +1610,13 @@ The publisher then:
 
 
 
-1\. Reads pending events
+1. Reads pending events
 
-2\. Publishes events to Kafka
+2. Publishes events to Kafka
 
-3\. Marks successfully published events
+3. Marks successfully published events
 
-4\. Continues processing remaining events
+4. Continues processing remaining events
 
 
 
@@ -1624,11 +1624,11 @@ The exact concurrency, retry, locking, and batching strategy belongs in the Low-
 
 
 
-\---
+---
 
 
 
-\# 31. Outbox Delivery Semantics
+# 31. Outbox Delivery Semantics
 
 
 
@@ -1652,11 +1652,11 @@ An event ID should be used to support consumer-side deduplication where necessar
 
 
 
-\---
+---
 
 
 
-\# 32. Outbox Retention
+# 32. Outbox Retention
 
 
 
@@ -1668,11 +1668,11 @@ A future retention policy may:
 
 
 
-\* Retain events for a defined period
+* Retain events for a defined period
 
-\* Archive events
+* Archive events
 
-\* Delete old published records
+* Delete old published records
 
 
 
@@ -1684,11 +1684,11 @@ No automatic deletion policy is required for the first version.
 
 
 
-\---
+---
 
 
 
-\# 33. Database Migration Strategy
+# 33. Database Migration Strategy
 
 
 
@@ -1722,11 +1722,11 @@ Production schemas must never depend on manually executed SQL scripts.
 
 
 
-\---
+---
 
 
 
-\# 34. Migration Principles
+# 34. Migration Principles
 
 
 
@@ -1734,15 +1734,15 @@ Migrations must be:
 
 
 
-\* Versioned
+* Versioned
 
-\* Reviewable
+* Reviewable
 
-\* Repeatable where appropriate
+* Repeatable where appropriate
 
-\* Executed automatically during deployment
+* Executed automatically during deployment
 
-\* Backward-compatible where practical
+* Backward-compatible where practical
 
 
 
@@ -1752,11 +1752,11 @@ Conceptual example:
 
 ```text
 
-V1\_\_create\_products.sql
+V1__create_products.sql
 
-V2\_\_create\_outbox\_events.sql
+V2__create_outbox_events.sql
 
-V3\_\_add\_product\_indexes.sql
+V3__add_product_indexes.sql
 
 ```
 
@@ -1766,11 +1766,11 @@ Exact naming depends on the selected migration framework.
 
 
 
-\---
+---
 
 
 
-\# 35. Development Database
+# 35. Development Database
 
 
 
@@ -1802,11 +1802,11 @@ Developers should be able to recreate the environment using Docker Compose and d
 
 
 
-\---
+---
 
 
 
-\# 36. Environment Configuration
+# 36. Environment Configuration
 
 
 
@@ -1820,15 +1820,15 @@ Conceptual configuration:
 
 ```text
 
-DB\_HOST
+DB_HOST
 
-DB\_PORT
+DB_PORT
 
-DB\_NAME
+DB_NAME
 
-DB\_USERNAME
+DB_USERNAME
 
-DB\_PASSWORD
+DB_PASSWORD
 
 ```
 
@@ -1858,11 +1858,11 @@ depending on the environment.
 
 
 
-\---
+---
 
 
 
-\# 37. Connection Pooling
+# 37. Connection Pooling
 
 
 
@@ -1882,21 +1882,21 @@ Pool values will be established using:
 
 
 
-\* Expected concurrency
+* Expected concurrency
 
-\* Database capacity
+* Database capacity
 
-\* Performance testing
+* Performance testing
 
-\* Deployment topology
-
-
-
-\---
+* Deployment topology
 
 
 
-\# 38. PostgreSQL and Kafka Transactions
+---
+
+
+
+# 38. PostgreSQL and Kafka Transactions
 
 
 
@@ -1942,11 +1942,11 @@ This avoids requiring a distributed transaction across PostgreSQL and Kafka.
 
 
 
-\---
+---
 
 
 
-\# 39. Referential Integrity
+# 39. Referential Integrity
 
 
 
@@ -1960,9 +1960,9 @@ References such as:
 
 ```text
 
-category\_id
+category_id
 
-brand\_id
+brand_id
 
 ```
 
@@ -1980,11 +1980,11 @@ This preserves service ownership boundaries.
 
 
 
-\---
+---
 
 
 
-\# 40. Data Ownership
+# 40. Data Ownership
 
 
 
@@ -2030,11 +2030,11 @@ Those capabilities belong to other services.
 
 
 
-\---
+---
 
 
 
-\# 41. Auditability
+# 41. Auditability
 
 
 
@@ -2044,9 +2044,9 @@ The initial Product table provides:
 
 ```text
 
-created\_at
+created_at
 
-updated\_at
+updated_at
 
 ```
 
@@ -2060,21 +2060,21 @@ A dedicated audit mechanism may be introduced later if compliance or business re
 
 
 
-\* Who changed a Product
+* Who changed a Product
 
-\* What changed
+* What changed
 
-\* When it changed
+* When it changed
 
-\* Previous values
-
-
-
-\---
+* Previous values
 
 
 
-\# 42. Data Consistency
+---
+
+
+
+# 42. Data Consistency
 
 
 
@@ -2154,11 +2154,11 @@ This distinction is intentional.
 
 
 
-\---
+---
 
 
 
-\# 43. Database Performance Principles
+# 43. Database Performance Principles
 
 
 
@@ -2166,19 +2166,19 @@ Initial performance priorities:
 
 
 
-1\. Correctness
+1. Correctness
 
-2\. Appropriate indexes
+2. Appropriate indexes
 
-3\. Efficient queries
+3. Efficient queries
 
-4\. Connection pool management
+4. Connection pool management
 
-5\. Transaction boundaries
+5. Transaction boundaries
 
-6\. Monitoring
+6. Monitoring
 
-7\. Performance testing
+7. Performance testing
 
 
 
@@ -2190,11 +2190,11 @@ Indexes should be justified by known query patterns or measured performance requ
 
 
 
-\---
+---
 
 
 
-\# 44. Database Security
+# 44. Database Security
 
 
 
@@ -2202,17 +2202,17 @@ The Product Service database must:
 
 
 
-\* Use authenticated database connections
+* Use authenticated database connections
 
-\* Use least-privilege database users
+* Use least-privilege database users
 
-\* Avoid exposing PostgreSQL directly to the public internet
+* Avoid exposing PostgreSQL directly to the public internet
 
-\* Use encrypted connections in production where required
+* Use encrypted connections in production where required
 
-\* Store credentials outside source control
+* Store credentials outside source control
 
-\* Restrict administrative database access
+* Restrict administrative database access
 
 
 
@@ -2220,11 +2220,11 @@ Local development may use simpler Docker-based configuration.
 
 
 
-\---
+---
 
 
 
-\# 45. Backup and Recovery
+# 45. Backup and Recovery
 
 
 
@@ -2232,15 +2232,15 @@ Production PostgreSQL must eventually have:
 
 
 
-\* Automated backups
+* Automated backups
 
-\* Point-in-time recovery where appropriate
+* Point-in-time recovery where appropriate
 
-\* Backup retention policy
+* Backup retention policy
 
-\* Restore testing
+* Restore testing
 
-\* Disaster recovery procedures
+* Disaster recovery procedures
 
 
 
@@ -2248,11 +2248,11 @@ These operational concerns are outside the initial local development setup.
 
 
 
-\---
+---
 
 
 
-\# 46. Database Monitoring
+# 46. Database Monitoring
 
 
 
@@ -2292,11 +2292,11 @@ The exact monitoring stack will be defined later.
 
 
 
-\---
+---
 
 
 
-\# 47. Initial Database Structure
+# 47. Initial Database Structure
 
 
 
@@ -2318,7 +2318,7 @@ PostgreSQL
 
 &#x20;   │
 
-&#x20;   └── outbox\_events
+&#x20;   └── outbox_events
 
 ```
 
@@ -2332,11 +2332,11 @@ Additional tables will only be introduced when required by the domain.
 
 
 
-\---
+---
 
 
 
-\# 48. Example Product Record
+# 48. Example Product Record
 
 
 
@@ -2382,13 +2382,13 @@ USD
 
 
 
-category\_id:
+category_id:
 
 01JCATEGORY001
 
 
 
-brand\_id:
+brand_id:
 
 01JBRAND001
 
@@ -2400,13 +2400,13 @@ ACTIVE
 
 
 
-created\_at:
+created_at:
 
 2026-08-23T10:30:00Z
 
 
 
-updated\_at:
+updated_at:
 
 2026-08-23T10:30:00Z
 
@@ -2414,11 +2414,11 @@ updated\_at:
 
 
 
-\---
+---
 
 
 
-\# 49. API-to-Database Mapping
+# 49. API-to-Database Mapping
 
 
 
@@ -2444,15 +2444,15 @@ price           → price
 
 currency        → currency
 
-categoryId      → category\_id
+categoryId      → category_id
 
-brandId         → brand\_id
+brandId         → brand_id
 
 status          → status
 
-createdAt       → created\_at
+createdAt       → created_at
 
-updatedAt       → updated\_at
+updatedAt       → updated_at
 
 ```
 
@@ -2462,11 +2462,11 @@ The API DTO and persistence entity do not need to be the same Java object.
 
 
 
-\---
+---
 
 
 
-\# 50. Database Design Non-Goals
+# 50. Database Design Non-Goals
 
 
 
@@ -2474,27 +2474,27 @@ The initial database design does not include:
 
 
 
-\* Inventory tables
+* Inventory tables
 
-\* Order tables
+* Order tables
 
-\* Payment tables
+* Payment tables
 
-\* Customer tables
+* Customer tables
 
-\* Product image storage
+* Product image storage
 
-\* Product review tables
+* Product review tables
 
-\* Recommendation data
+* Recommendation data
 
-\* Search engine indexes
+* Search engine indexes
 
-\* Analytics warehouse tables
+* Analytics warehouse tables
 
-\* Distributed database architecture
+* Distributed database architecture
 
-\* Database sharding
+* Database sharding
 
 
 
@@ -2502,15 +2502,15 @@ These concerns will be addressed only when their corresponding capabilities are 
 
 
 
-\---
+---
 
 
 
-\# 51. Database Design Status
+# 51. Database Design Status
 
 
 
-\*\*Status:\*\* Draft
+**Status:** Draft
 
 
 
@@ -2522,15 +2522,15 @@ It has been aligned with:
 
 
 
-\* BRD
+* BRD
 
-\* FRD
+* FRD
 
-\* Domain Model
+* Domain Model
 
-\* HLD
+* HLD
 
-\* API Design
+* API Design
 
 
 
@@ -2538,11 +2538,11 @@ The next step is to turn this logical design into executable database migrations
 
 
 
-\---
+---
 
 
 
-\# 52. Next Steps
+# 52. Next Steps
 
 
 
@@ -2550,33 +2550,33 @@ After database design approval:
 
 
 
-1\. Select Flyway or Liquibase
+1. Select Flyway or Liquibase
 
-2\. Create the initial Product Service project
+2. Create the initial Product Service project
 
-3\. Create database migrations
+3. Create database migrations
 
-4\. Configure PostgreSQL connectivity
+4. Configure PostgreSQL connectivity
 
-5\. Implement the domain model
+5. Implement the domain model
 
-6\. Implement persistence entities
+6. Implement persistence entities
 
-7\. Implement repositories
+7. Implement repositories
 
-8\. Implement application services
+8. Implement application services
 
-9\. Implement REST controllers
+9. Implement REST controllers
 
-10\. Implement automated tests
+10. Implement automated tests
 
-11\. Implement transactional outbox
+11. Implement transactional outbox
 
-12\. Add OpenAPI documentation
+12. Add OpenAPI documentation
 
-13\. Run the Product Service locally
+13. Run the Product Service locally
 
-14\. Validate the complete API against PostgreSQL
+14. Validate the complete API against PostgreSQL
 
 
 
@@ -2584,11 +2584,11 @@ After database design approval:
 
 
 
-\### Final verdict
+### Final verdict
 
 
 
-\*\*`DATABASE\_DESIGN.md` is now approved for implementation. ✅\*\*
+**`DATABASE_DESIGN.md` is now approved for implementation. ✅**
 
 
 
@@ -2596,15 +2596,15 @@ The two changes from the previous review are incorporated:
 
 
 
-\- `currency` → `VARCHAR(3)`
+- `currency` → `VARCHAR(3)`
 
-\- Initial indexes kept deliberately minimal
+- Initial indexes kept deliberately minimal
 
-\- Partial index added for unpublished outbox events
+- Partial index added for unpublished outbox events
 
-\- Outbox duplicate-delivery semantics explicitly documented
+- Outbox duplicate-delivery semantics explicitly documented
 
-\- ULID generation responsibility explicitly assigned to the application
+- ULID generation responsibility explicitly assigned to the application
 
 
 
@@ -2614,7 +2614,7 @@ You can now commit it:
 
 ```powershell
 
-git add docs/architecture/DATABASE\_DESIGN.md
+git add docs/architecture/DATABASE_DESIGN.md
 
 git commit -m "docs: define product service database design"
 
@@ -2624,11 +2624,11 @@ git push origin main
 
 
 
-After that, we're done with the \*\*logical architecture/design documents\*\*.
+After that, we're done with the **logical architecture/design documents**.
 
 
 
-\*\*Next: we stop writing documents and start creating the actual Spring Boot project.\*\*
+**Next: we stop writing documents and start creating the actual Spring Boot project.**
 
 
 
