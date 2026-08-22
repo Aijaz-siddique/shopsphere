@@ -1,40 +1,40 @@
-Absolutely. Below is the \*\*complete revised `API\_DESIGN.md`\*\*, incorporating the review changes. Replace the existing file with this entire content.
+Absolutely. Below is the **complete revised `API_DESIGN.md`**, incorporating the review changes. Replace the existing file with this entire content.
 
 
 
 ````markdown
 
-\# ShopSphere
+# ShopSphere
 
-\## Product Service API Design
-
-
-
-\*\*Document Version:\*\* 1.1  
-
-\*\*Status:\*\* Draft  
-
-\*\*Related Documents:\*\*
-
-\- `docs/product-service/BRD.md`
-
-\- `docs/product-service/FRD.md`
-
-\- `docs/product-service/DOMAIN\_MODEL.md`
-
-\- `docs/architecture/HLD.md`
+## Product Service API Design
 
 
 
-\*\*Last Updated:\*\* 2026-08-23
+**Document Version:** 1.1  
+
+**Status:** Draft  
+
+**Related Documents:**
+
+- `docs/product-service/BRD.md`
+
+- `docs/product-service/FRD.md`
+
+- `docs/product-service/DOMAIN_MODEL.md`
+
+- `docs/architecture/HLD.md`
 
 
 
-\---
+**Last Updated:** 2026-08-23
 
 
 
-\# 1. Purpose
+---
+
+
+
+# 1. Purpose
 
 
 
@@ -46,33 +46,33 @@ It defines:
 
 
 
-\- API endpoints
+- API endpoints
 
-\- HTTP methods
+- HTTP methods
 
-\- Request structures
+- Request structures
 
-\- Response structures
+- Response structures
 
-\- Validation rules
+- Validation rules
 
-\- HTTP status codes
+- HTTP status codes
 
-\- Error responses
+- Error responses
 
-\- Pagination
+- Pagination
 
-\- Filtering
+- Filtering
 
-\- Sorting
+- Sorting
 
-\- API versioning
+- API versioning
 
-\- Idempotency
+- Idempotency
 
-\- Correlation IDs
+- Correlation IDs
 
-\- Authentication expectations
+- Authentication expectations
 
 
 
@@ -84,11 +84,11 @@ Internal implementation details such as controllers, services, repositories, and
 
 
 
-\---
+---
 
 
 
-\# 2. API Design Principles
+# 2. API Design Principles
 
 
 
@@ -96,39 +96,39 @@ The Product Service API follows these principles:
 
 
 
-1\. RESTful resource-oriented APIs
+1. RESTful resource-oriented APIs
 
-2\. Explicit API versioning
+2. Explicit API versioning
 
-3\. JSON request and response bodies
+3. JSON request and response bodies
 
-4\. Consistent HTTP status codes
+4. Consistent HTTP status codes
 
-5\. Consistent error responses
+5. Consistent error responses
 
-6\. Validation at the API boundary
+6. Validation at the API boundary
 
-7\. Pagination for collection endpoints
+7. Pagination for collection endpoints
 
-8\. No database models exposed directly
+8. No database models exposed directly
 
-9\. Stable API contracts
+9. Stable API contracts
 
-10\. Backward compatibility where practical
+10. Backward compatibility where practical
 
-11\. Correlation IDs for traceability
+11. Correlation IDs for traceability
 
-12\. Idempotency for retry-sensitive operations where required
+12. Idempotency for retry-sensitive operations where required
 
-13\. API contracts remain independent of persistence implementation
-
-
-
-\---
+13. API contracts remain independent of persistence implementation
 
 
 
-\# 3. Base URL
+---
+
+
+
+# 3. Base URL
 
 
 
@@ -188,11 +188,11 @@ The production hostname is intentionally not defined yet.
 
 
 
-\---
+---
 
 
 
-\# 4. Resource Model
+# 4. Resource Model
 
 
 
@@ -248,11 +248,11 @@ The API representation is intentionally separate from the database representatio
 
 
 
-\---
+---
 
 
 
-\# 5. Product Lifecycle
+# 5. Product Lifecycle
 
 
 
@@ -318,15 +318,15 @@ Business rules for lifecycle transitions belong to the domain/application layer.
 
 
 
-\---
+---
 
 
 
-\# 6. Create Product
+# 6. Create Product
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -346,11 +346,11 @@ A newly created Product initially enters the `DRAFT` state.
 
 
 
-\---
+---
 
 
 
-\## Request Headers
+## Request Headers
 
 
 
@@ -374,11 +374,11 @@ Authentication will eventually be required for this operation.
 
 
 
-\---
+---
 
 
 
-\## Request Body
+## Request Body
 
 
 
@@ -406,11 +406,11 @@ Authentication will eventually be required for this operation.
 
 
 
-\---
+---
 
 
 
-\## Request Fields
+## Request Fields
 
 
 
@@ -434,69 +434,69 @@ Authentication will eventually be required for this operation.
 
 
 
-\---
+---
 
 
 
-\## Validation
+## Validation
 
 
 
-\### SKU
+### SKU
 
 
 
-\* Required
+* Required
 
-\* Must be unique
+* Must be unique
 
-\* Must not be blank
+* Must not be blank
 
-\* Maximum length will be defined in domain constraints
-
-
-
-\### Name
+* Maximum length will be defined in domain constraints
 
 
 
-\* Required
-
-\* Must not be blank
+### Name
 
 
 
-\### Price
+* Required
+
+* Must not be blank
 
 
 
-\* Required
-
-\* Must be greater than or equal to zero
-
-\* Monetary precision must be controlled
+### Price
 
 
 
-\### Currency
+* Required
+
+* Must be greater than or equal to zero
+
+* Monetary precision must be controlled
 
 
 
-\* Required
-
-\* Must be a valid supported currency code
+### Currency
 
 
 
-\---
+* Required
+
+* Must be a valid supported currency code
 
 
 
-\## Success Response
+---
 
 
 
-\### HTTP 201 Created
+## Success Response
+
+
+
+### HTTP 201 Created
 
 
 
@@ -532,11 +532,11 @@ Authentication will eventually be required for this operation.
 
 
 
-\---
+---
 
 
 
-\## Response Headers
+## Response Headers
 
 
 
@@ -554,15 +554,15 @@ X-Correlation-ID: <correlation-id>
 
 
 
-\---
+---
 
 
 
-\# 7. Get Product
+# 7. Get Product
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -578,11 +578,11 @@ Returns a single product.
 
 
 
-\---
+---
 
 
 
-\## Example
+## Example
 
 
 
@@ -594,15 +594,15 @@ GET /api/v1/products/01JABC123XYZ
 
 
 
-\---
+---
 
 
 
-\## Success Response
+## Success Response
 
 
 
-\### HTTP 200 OK
+### HTTP 200 OK
 
 
 
@@ -638,15 +638,15 @@ GET /api/v1/products/01JABC123XYZ
 
 
 
-\---
+---
 
 
 
-\## Product Not Found
+## Product Not Found
 
 
 
-\### HTTP 404 Not Found
+### HTTP 404 Not Found
 
 
 
@@ -654,7 +654,7 @@ GET /api/v1/products/01JABC123XYZ
 
 {
 
-&#x20; "code": "PRODUCT\_NOT\_FOUND",
+&#x20; "code": "PRODUCT_NOT_FOUND",
 
 &#x20; "message": "Product was not found",
 
@@ -668,15 +668,15 @@ GET /api/v1/products/01JABC123XYZ
 
 
 
-\---
+---
 
 
 
-\# 8. List Products
+# 8. List Products
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -692,11 +692,11 @@ Returns a paginated collection of products.
 
 
 
-\---
+---
 
 
 
-\# 9. Pagination
+# 9. Pagination
 
 
 
@@ -710,7 +710,7 @@ Example:
 
 ```http
 
-GET /api/v1/products?page=0\&size=20
+GET /api/v1/products?page=0&size=20
 
 ```
 
@@ -746,15 +746,15 @@ Initial proposed maximum:
 
 
 
-\---
+---
 
 
 
-\# 10. List Response
+# 10. List Response
 
 
 
-\### HTTP 200 OK
+### HTTP 200 OK
 
 
 
@@ -762,7 +762,7 @@ Initial proposed maximum:
 
 {
 
-&#x20; "content": \[
+&#x20; "content": [
 
 &#x20;   {
 
@@ -806,11 +806,11 @@ Initial proposed maximum:
 
 
 
-\---
+---
 
 
 
-\# 11. Product Filtering
+# 11. Product Filtering
 
 
 
@@ -858,7 +858,7 @@ Example:
 
 ```http
 
-GET /api/v1/products?status=ACTIVE\&categoryId=01JCATEGORY001
+GET /api/v1/products?status=ACTIVE&categoryId=01JCATEGORY001
 
 ```
 
@@ -868,11 +868,11 @@ Only explicitly supported filters will be exposed.
 
 
 
-\---
+---
 
 
 
-\# 12. Product Search
+# 12. Product Search
 
 
 
@@ -904,11 +904,11 @@ Search semantics may be expanded later without changing the core Product resourc
 
 
 
-\---
+---
 
 
 
-\# 13. Sorting
+# 13. Sorting
 
 
 
@@ -966,15 +966,15 @@ The service must not allow arbitrary database column names to be passed as sort 
 
 
 
-\---
+---
 
 
 
-\# 14. Update Product
+# 14. Update Product
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -998,11 +998,11 @@ Clients should provide all mutable Product fields.
 
 
 
-\---
+---
 
 
 
-\## Example
+## Example
 
 
 
@@ -1014,11 +1014,11 @@ PUT /api/v1/products/01JABC123XYZ
 
 
 
-\---
+---
 
 
 
-\## Request
+## Request
 
 
 
@@ -1046,15 +1046,15 @@ PUT /api/v1/products/01JABC123XYZ
 
 
 
-\---
+---
 
 
 
-\## Success Response
+## Success Response
 
 
 
-\### HTTP 200 OK
+### HTTP 200 OK
 
 
 
@@ -1062,27 +1062,27 @@ Returns the updated Product representation.
 
 
 
-\---
+---
 
 
 
-\## Product Not Found
+## Product Not Found
 
 
 
-\### HTTP 404 Not Found
+### HTTP 404 Not Found
 
 
 
-Returns the standard `PRODUCT\_NOT\_FOUND` error response.
+Returns the standard `PRODUCT_NOT_FOUND` error response.
 
 
 
-\---
+---
 
 
 
-\## Concurrent Update Protection
+## Concurrent Update Protection
 
 
 
@@ -1106,15 +1106,15 @@ This is intentionally deferred until concurrent update requirements are establis
 
 
 
-\---
+---
 
 
 
-\# 15. Activate Product
+# 15. Activate Product
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -1142,15 +1142,15 @@ DRAFT → ACTIVE
 
 
 
-\---
+---
 
 
 
-\## Success Response
+## Success Response
 
 
 
-\### HTTP 200 OK
+### HTTP 200 OK
 
 
 
@@ -1170,15 +1170,15 @@ DRAFT → ACTIVE
 
 
 
-\---
+---
 
 
 
-\## Invalid State Transition
+## Invalid State Transition
 
 
 
-\### HTTP 409 Conflict
+### HTTP 409 Conflict
 
 
 
@@ -1186,7 +1186,7 @@ DRAFT → ACTIVE
 
 {
 
-&#x20; "code": "INVALID\_PRODUCT\_STATE",
+&#x20; "code": "INVALID_PRODUCT_STATE",
 
 &#x20; "message": "Product cannot be activated from its current state",
 
@@ -1204,15 +1204,15 @@ Exact lifecycle transition rules belong to the domain model.
 
 
 
-\---
+---
 
 
 
-\# 16. Deactivate Product
+# 16. Deactivate Product
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -1240,15 +1240,15 @@ ACTIVE → INACTIVE
 
 
 
-\---
+---
 
 
 
-\## Success Response
+## Success Response
 
 
 
-\### HTTP 200 OK
+### HTTP 200 OK
 
 
 
@@ -1268,15 +1268,15 @@ ACTIVE → INACTIVE
 
 
 
-\---
+---
 
 
 
-\# 17. Archive Product
+# 17. Archive Product
 
 
 
-\## Endpoint
+## Endpoint
 
 
 
@@ -1308,15 +1308,15 @@ The operation must obey valid domain lifecycle transitions.
 
 
 
-\---
+---
 
 
 
-\## Success Response
+## Success Response
 
 
 
-\### HTTP 200 OK
+### HTTP 200 OK
 
 
 
@@ -1336,11 +1336,11 @@ The operation must obey valid domain lifecycle transitions.
 
 
 
-\---
+---
 
 
 
-\# 18. Delete Product
+# 18. Delete Product
 
 
 
@@ -1376,11 +1376,11 @@ Lifecycle state changes are safer than physical deletion.
 
 
 
-\---
+---
 
 
 
-\# 19. HTTP Status Codes
+# 19. HTTP Status Codes
 
 
 
@@ -1424,11 +1424,11 @@ HTTP 422 is intentionally not part of the initial API contract.
 
 
 
-\---
+---
 
 
 
-\# 20. Validation Error
+# 20. Validation Error
 
 
 
@@ -1440,7 +1440,7 @@ Example:
 
 
 
-\### HTTP 400 Bad Request
+### HTTP 400 Bad Request
 
 
 
@@ -1448,7 +1448,7 @@ Example:
 
 {
 
-&#x20; "code": "VALIDATION\_ERROR",
+&#x20; "code": "VALIDATION_ERROR",
 
 &#x20; "message": "Request validation failed",
 
@@ -1456,7 +1456,7 @@ Example:
 
 &#x20; "timestamp": "2026-08-23T11:05:00Z",
 
-&#x20; "errors": \[
+&#x20; "errors": [
 
 &#x20;   {
 
@@ -1482,11 +1482,11 @@ Example:
 
 
 
-\---
+---
 
 
 
-\# 21. Duplicate SKU
+# 21. Duplicate SKU
 
 
 
@@ -1498,7 +1498,7 @@ If a client attempts to create a product using an existing SKU:
 
 
 
-\### HTTP 409 Conflict
+### HTTP 409 Conflict
 
 
 
@@ -1506,7 +1506,7 @@ If a client attempts to create a product using an existing SKU:
 
 {
 
-&#x20; "code": "SKU\_ALREADY\_EXISTS",
+&#x20; "code": "SKU_ALREADY_EXISTS",
 
 &#x20; "message": "A product with this SKU already exists",
 
@@ -1524,11 +1524,11 @@ The database must also enforce SKU uniqueness.
 
 
 
-\---
+---
 
 
 
-\# 22. General Error Contract
+# 22. General Error Contract
 
 
 
@@ -1540,7 +1540,7 @@ All Product Service errors should follow a common structure.
 
 {
 
-&#x20; "code": "ERROR\_CODE",
+&#x20; "code": "ERROR_CODE",
 
 &#x20; "message": "Human-readable error message",
 
@@ -1560,7 +1560,7 @@ Optional validation details:
 
 ```json
 
-"errors": \[
+"errors": [
 
 &#x20; {
 
@@ -1576,11 +1576,11 @@ Optional validation details:
 
 
 
-\---
+---
 
 
 
-\# 23. Error Code Principles
+# 23. Error Code Principles
 
 
 
@@ -1588,13 +1588,13 @@ Error codes should be:
 
 
 
-\* Stable
+* Stable
 
-\* Machine-readable
+* Machine-readable
 
-\* Meaningful
+* Meaningful
 
-\* Independent of internal Java exception names
+* Independent of internal Java exception names
 
 
 
@@ -1604,13 +1604,13 @@ Good:
 
 ```text
 
-PRODUCT\_NOT\_FOUND
+PRODUCT_NOT_FOUND
 
-SKU\_ALREADY\_EXISTS
+SKU_ALREADY_EXISTS
 
-VALIDATION\_ERROR
+VALIDATION_ERROR
 
-INVALID\_PRODUCT\_STATE
+INVALID_PRODUCT_STATE
 
 ```
 
@@ -1636,11 +1636,11 @@ Internal implementation exceptions must never become the public API contract.
 
 
 
-\---
+---
 
 
 
-\# 24. Correlation ID
+# 24. Correlation ID
 
 
 
@@ -1668,13 +1668,13 @@ The ID should appear in:
 
 
 
-\* Response headers
+* Response headers
 
-\* Logs
+* Logs
 
-\* Error responses
+* Error responses
 
-\* Downstream requests
+* Downstream requests
 
 
 
@@ -1694,11 +1694,11 @@ The same identifier should be propagated where appropriate across downstream ser
 
 
 
-\---
+---
 
 
 
-\# 25. Authentication
+# 25. Authentication
 
 
 
@@ -1748,11 +1748,11 @@ Exact authentication implementation is deferred to Security Design.
 
 
 
-\---
+---
 
 
 
-\# 26. Authorization
+# 26. Authorization
 
 
 
@@ -1764,19 +1764,19 @@ Initial conceptual permissions:
 
 | ------------------ | ------------------- |
 
-| List Products      | PRODUCT\_READ        |
+| List Products      | PRODUCT_READ        |
 
-| Get Product        | PRODUCT\_READ        |
+| Get Product        | PRODUCT_READ        |
 
-| Create Product     | PRODUCT\_WRITE       |
+| Create Product     | PRODUCT_WRITE       |
 
-| Update Product     | PRODUCT\_WRITE       |
+| Update Product     | PRODUCT_WRITE       |
 
-| Activate Product   | PRODUCT\_WRITE       |
+| Activate Product   | PRODUCT_WRITE       |
 
-| Deactivate Product | PRODUCT\_WRITE       |
+| Deactivate Product | PRODUCT_WRITE       |
 
-| Archive Product    | PRODUCT\_WRITE       |
+| Archive Product    | PRODUCT_WRITE       |
 
 
 
@@ -1784,11 +1784,11 @@ The exact role-to-permission mapping will be finalized during authentication and
 
 
 
-\---
+---
 
 
 
-\# 27. Idempotency
+# 27. Idempotency
 
 
 
@@ -1826,11 +1826,11 @@ SKU uniqueness provides an additional business-level protection against duplicat
 
 
 
-\---
+---
 
 
 
-\# 28. API Caching
+# 28. API Caching
 
 
 
@@ -1860,11 +1860,11 @@ Caching will only be introduced when justified by performance or scalability req
 
 
 
-\---
+---
 
 
 
-\# 29. Request Timeout
+# 29. Request Timeout
 
 
 
@@ -1884,11 +1884,11 @@ Such operations may eventually be converted to asynchronous workflows.
 
 
 
-\---
+---
 
 
 
-\# 30. API Security
+# 30. API Security
 
 
 
@@ -1904,23 +1904,23 @@ Examples of information that must not appear in logs:
 
 
 
-\* Passwords
+* Passwords
 
-\* Authentication tokens
+* Authentication tokens
 
-\* API secrets
+* API secrets
 
-\* Payment credentials
+* Payment credentials
 
-\* Sensitive personal information
-
-
-
-\---
+* Sensitive personal information
 
 
 
-\# 31. API Observability
+---
+
+
+
+# 31. API Observability
 
 
 
@@ -1954,11 +1954,11 @@ Logs must avoid sensitive information.
 
 
 
-\---
+---
 
 
 
-\# 32. API Compatibility
+# 32. API Compatibility
 
 
 
@@ -1988,11 +1988,11 @@ Non-breaking additions should preferably be introduced without creating unnecess
 
 
 
-\---
+---
 
 
 
-\# 33. API Documentation
+# 33. API Documentation
 
 
 
@@ -2028,11 +2028,11 @@ OpenAPI will become the executable API contract where practical.
 
 
 
-\---
+---
 
 
 
-\# 34. Initial API Summary
+# 34. Initial API Summary
 
 
 
@@ -2060,11 +2060,11 @@ No physical DELETE endpoint initially.
 
 
 
-\---
+---
 
 
 
-\# 35. Example API Flow
+# 35. Example API Flow
 
 
 
@@ -2140,11 +2140,11 @@ The Product database transaction and event publication must preserve the consist
 
 
 
-\---
+---
 
 
 
-\# 36. API-to-Domain Alignment
+# 36. API-to-Domain Alignment
 
 
 
@@ -2194,11 +2194,11 @@ The API contract represents the business capability, not the database schema.
 
 
 
-\---
+---
 
 
 
-\# 37. API-to-Database Separation
+# 37. API-to-Database Separation
 
 
 
@@ -2246,11 +2246,11 @@ Changes to database implementation should not automatically become breaking API 
 
 
 
-\---
+---
 
 
 
-\# 38. Future API Considerations
+# 38. Future API Considerations
 
 
 
@@ -2258,31 +2258,31 @@ The following are intentionally deferred:
 
 
 
-\* Bulk Product operations
+* Bulk Product operations
 
-\* Product images
+* Product images
 
-\* Product variants
+* Product variants
 
-\* Product attributes
+* Product attributes
 
-\* Advanced search
+* Advanced search
 
-\* Full-text search
+* Full-text search
 
-\* Faceted search
+* Faceted search
 
-\* Product recommendations
+* Product recommendations
 
-\* Category management APIs
+* Category management APIs
 
-\* Brand management APIs
+* Brand management APIs
 
-\* Import/export APIs
+* Import/export APIs
 
-\* Webhooks
+* Webhooks
 
-\* GraphQL
+* GraphQL
 
 
 
@@ -2290,11 +2290,11 @@ These will be introduced only when required.
 
 
 
-\---
+---
 
 
 
-\# 39. Non-Goals
+# 39. Non-Goals
 
 
 
@@ -2302,21 +2302,21 @@ The initial Product API will not attempt to solve:
 
 
 
-\* Inventory management
+* Inventory management
 
-\* Order management
+* Order management
 
-\* Payment processing
+* Payment processing
 
-\* Customer management
+* Customer management
 
-\* Search engine integration
+* Search engine integration
 
-\* Recommendation engine
+* Recommendation engine
 
-\* Product reviews
+* Product reviews
 
-\* Product analytics
+* Product analytics
 
 
 
@@ -2324,15 +2324,15 @@ Those belong to other capabilities.
 
 
 
-\---
+---
 
 
 
-\# 40. API Design Status
+# 40. API Design Status
 
 
 
-\*\*Status:\*\* Draft
+**Status:** Draft
 
 
 
@@ -2344,13 +2344,13 @@ It will be reviewed against:
 
 
 
-\* BRD
+* BRD
 
-\* FRD
+* FRD
 
-\* Domain Model
+* Domain Model
 
-\* HLD
+* HLD
 
 
 
@@ -2358,11 +2358,11 @@ before implementation begins.
 
 
 
-\---
+---
 
 
 
-\# 41. Next Steps
+# 41. Next Steps
 
 
 
@@ -2370,25 +2370,25 @@ After API design approval:
 
 
 
-1\. Review API contract
+1. Review API contract
 
-2\. Create `DATABASE\_DESIGN.md`
+2. Create `DATABASE_DESIGN.md`
 
-3\. Define Product database schema
+3. Define Product database schema
 
-4\. Define indexes and constraints
+4. Define indexes and constraints
 
-5\. Define database migrations
+5. Define database migrations
 
-6\. Create Product Service LLD
+6. Create Product Service LLD
 
-7\. Implement Spring Boot Product Service
+7. Implement Spring Boot Product Service
 
-8\. Add automated tests
+8. Add automated tests
 
-9\. Integrate PostgreSQL
+9. Integrate PostgreSQL
 
-10\. Add API documentation
+10. Add API documentation
 
 
 
@@ -2396,27 +2396,27 @@ After API design approval:
 
 
 
-\### One small note
+### One small note
 
 
 
-I intentionally kept the document at \*\*API-contract level\*\*. We are \*not\* yet specifying things like:
+I intentionally kept the document at **API-contract level**. We are *not* yet specifying things like:
 
 
 
-\- Spring controller classes
+- Spring controller classes
 
-\- DTO class names
+- DTO class names
 
-\- JPA entities
+- JPA entities
 
-\- repository methods
+- repository methods
 
-\- exact database columns
+- exact database columns
 
-\- Kafka topic implementation
+- Kafka topic implementation
 
-\- JWT implementation
+- JWT implementation
 
 
 
@@ -2424,7 +2424,7 @@ Those belong in the next design stages.
 
 
 
-Once you've replaced the file, \*\*don't commit yet\*\*. We'll do one final review of this revised version, then commit it.
+Once you've replaced the file, **don't commit yet**. We'll do one final review of this revised version, then commit it.
 
 ```
 
