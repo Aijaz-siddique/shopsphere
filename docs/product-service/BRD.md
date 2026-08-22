@@ -1,26 +1,26 @@
-\# ShopSphere Product Service
+# ShopSphere Product Service
 
-\## Business Requirements Document (BRD)
-
-
-
-\*\*Document Version:\*\* 1.0  
-
-\*\*Status:\*\* Draft  
-
-\*\*Service:\*\* Product Service  
-
-\*\*Project:\*\* ShopSphere  
-
-\*\*Date:\*\* 2026-08-22
+## Business Requirements Document (BRD)
 
 
 
-\---
+**Document Version:** 1.0  
+
+**Status:** Draft  
+
+**Service:** Product Service  
+
+**Project:** ShopSphere  
+
+**Date:** 2026-08-22
 
 
 
-\# 1. Document Purpose
+---
+
+
+
+# 1. Document Purpose
 
 
 
@@ -36,19 +36,19 @@ It will provide capabilities for:
 
 
 
-\- Creating products
+- Creating products
 
-\- Updating products
+- Updating products
 
-\- Viewing products
+- Viewing products
 
-\- Searching products
+- Searching products
 
-\- Managing product lifecycle
+- Managing product lifecycle
 
-\- Activating and deactivating products
+- Activating and deactivating products
 
-\- Archiving products
+- Archiving products
 
 
 
@@ -56,11 +56,11 @@ The Product Service will be implemented as an independently deployable microserv
 
 
 
-\---
+---
 
 
 
-\# 2. Business Context
+# 2. Business Context
 
 
 
@@ -80,11 +80,11 @@ Other services may consume product information, but they should not directly mod
 
 
 
-\---
+---
 
 
 
-\# 3. Business Objectives
+# 3. Business Objectives
 
 
 
@@ -92,31 +92,31 @@ The Product Service should:
 
 
 
-1\. Provide a reliable source of product information.
+1. Provide a reliable source of product information.
 
-2\. Allow authorized users to manage the product catalog.
+2. Allow authorized users to manage the product catalog.
 
-3\. Allow customers to discover available products.
+3. Allow customers to discover available products.
 
-4\. Support product lifecycle management.
+4. Support product lifecycle management.
 
-5\. Scale independently from other ShopSphere services.
+5. Scale independently from other ShopSphere services.
 
-6\. Provide APIs that can be consumed by the web application and other services.
+6. Provide APIs that can be consumed by the web application and other services.
 
-7\. Publish product-related events for downstream services.
+7. Publish product-related events for downstream services.
 
-8\. Maintain data integrity and consistency.
+8. Maintain data integrity and consistency.
 
-9\. Provide sufficient observability for production operations.
-
-
-
-\---
+9. Provide sufficient observability for production operations.
 
 
 
-\# 4. Stakeholders
+---
+
+
+
+# 4. Stakeholders
 
 
 
@@ -142,15 +142,15 @@ The Product Service should:
 
 
 
-\---
+---
 
 
 
-\# 5. Actors
+# 5. Actors
 
 
 
-\## 5.1 Customer
+## 5.1 Customer
 
 
 
@@ -158,13 +158,13 @@ Customers can:
 
 
 
-\- View active products
+- View active products
 
-\- Search products
+- Search products
 
-\- Filter products
+- Filter products
 
-\- View product details
+- View product details
 
 
 
@@ -172,19 +172,19 @@ Customers cannot:
 
 
 
-\- Create products
+- Create products
 
-\- Modify products
+- Modify products
 
-\- Delete products
-
-
-
-\---
+- Delete products
 
 
 
-\## 5.2 Product Manager
+---
+
+
+
+## 5.2 Product Manager
 
 
 
@@ -192,25 +192,25 @@ Product Managers can:
 
 
 
-\- Create products
+- Create products
 
-\- Update products
+- Update products
 
-\- Activate products
+- Activate products
 
-\- Deactivate products
+- Deactivate products
 
-\- Archive products
+- Archive products
 
-\- View product information
-
-
-
-\---
+- View product information
 
 
 
-\## 5.3 Administrator
+---
+
+
+
+## 5.3 Administrator
 
 
 
@@ -218,11 +218,11 @@ Administrators have full access to product management capabilities.
 
 
 
-\---
+---
 
 
 
-\# 6. Product Definition
+# 6. Product Definition
 
 
 
@@ -264,11 +264,11 @@ A product initially contains:
 
 
 
-\---
+---
 
 
 
-\# 7. Product Lifecycle
+# 7. Product Lifecycle
 
 
 
