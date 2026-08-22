@@ -1,6 +1,6 @@
 
 
-\## 1. Create the FRD
+## 1. Create the FRD
 
 
 
@@ -52,7 +52,7 @@ Code
 
 
 
-\### The first few use cases will be:
+### The first few use cases will be:
 
 
 
@@ -78,11 +78,11 @@ Code
 
 
 
-\---
+---
 
 
 
-\# 2. FRD — Version 1
+# 2. FRD — Version 1
 
 
 
@@ -92,25 +92,25 @@ Put this in `FRD.md`:
 
 ````markdown
 
-\# ShopSphere Product Service
+# ShopSphere Product Service
 
-\## Functional Requirements Document (FRD)
-
-
-
-\*\*Document Version:\*\* 1.0  
-
-\*\*Status:\*\* Draft  
-
-\*\*Related BRD:\*\* `docs/product-service/BRD.md`
+## Functional Requirements Document (FRD)
 
 
 
-\---
+**Document Version:** 1.0  
+
+**Status:** Draft  
+
+**Related BRD:** `docs/product-service/BRD.md`
 
 
 
-\# 1. Purpose
+---
+
+
+
+# 1. Purpose
 
 
 
@@ -122,33 +122,15 @@ The Product Service is responsible for managing the product catalog and exposing
 
 
 
-\---
+---
 
 
 
-\# 2. Actors
+# 2. Actors
 
 
 
-\## Customer
-
-
-
-Can:
-
-
-
-\- View active products
-
-\- Search active products
-
-\- Filter active products
-
-\- View product details
-
-
-
-\## Product Manager
+## Customer
 
 
 
@@ -156,21 +138,39 @@ Can:
 
 
 
-\- Create products
+- View active products
 
-\- Update products
+- Search active products
 
-\- Activate products
+- Filter active products
 
-\- Deactivate products
-
-\- Archive products
-
-\- View products
+- View product details
 
 
 
-\## Administrator
+## Product Manager
+
+
+
+Can:
+
+
+
+- Create products
+
+- Update products
+
+- Activate products
+
+- Deactivate products
+
+- Archive products
+
+- View products
+
+
+
+## Administrator
 
 
 
@@ -178,11 +178,11 @@ Can perform all Product Manager operations.
 
 
 
-\---
+---
 
 
 
-\# 3. Product States
+# 3. Product States
 
 
 
@@ -258,15 +258,15 @@ A product in `ARCHIVED` state cannot return to another state.
 
 
 
-\---
+---
 
 
 
-\# 4. UC-001 Create Product
+# 4. UC-001 Create Product
 
 
 
-\## Actor
+## Actor
 
 
 
@@ -274,7 +274,7 @@ Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -282,65 +282,65 @@ Creates a new product in the catalog.
 
 
 
-\## Preconditions
+## Preconditions
 
 
 
-\* User is authenticated.
+* User is authenticated.
 
-\* User has product management permission.
-
-
-
-\## Main Flow
+* User has product management permission.
 
 
 
-1\. User submits product information.
-
-2\. System validates the request.
-
-3\. System validates SKU uniqueness.
-
-4\. System validates price.
-
-5\. System validates currency.
-
-6\. System creates the product.
-
-7\. Product status is set to `DRAFT`.
-
-8\. System stores the product.
-
-9\. System returns the created product.
+## Main Flow
 
 
 
-\## Required Fields
+1. User submits product information.
+
+2. System validates the request.
+
+3. System validates SKU uniqueness.
+
+4. System validates price.
+
+5. System validates currency.
+
+6. System creates the product.
+
+7. Product status is set to `DRAFT`.
+
+8. System stores the product.
+
+9. System returns the created product.
 
 
 
-\* SKU
-
-\* Name
-
-\* Description
-
-\* Category
-
-\* Brand
-
-\* Price
-
-\* Currency
+## Required Fields
 
 
 
-\## Failure Scenarios
+* SKU
+
+* Name
+
+* Description
+
+* Category
+
+* Brand
+
+* Price
+
+* Currency
 
 
 
-\### Duplicate SKU
+## Failure Scenarios
+
+
+
+### Duplicate SKU
 
 
 
@@ -348,7 +348,7 @@ Return a conflict response.
 
 
 
-\### Invalid price
+### Invalid price
 
 
 
@@ -356,7 +356,7 @@ Return a validation error.
 
 
 
-\### Invalid currency
+### Invalid currency
 
 
 
@@ -364,15 +364,15 @@ Return a validation error.
 
 
 
-\---
+---
 
 
 
-\# 5. UC-002 Get Product
+# 5. UC-002 Get Product
 
 
 
-\## Actor
+## Actor
 
 
 
@@ -380,7 +380,7 @@ Customer / Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -388,23 +388,23 @@ Retrieves a product using its unique ID.
 
 
 
-\## Main Flow
+## Main Flow
 
 
 
-1\. User sends product ID.
+1. User sends product ID.
 
-2\. System validates the ID.
+2. System validates the ID.
 
-3\. System retrieves the product.
+3. System retrieves the product.
 
-4\. System verifies visibility rules.
+4. System verifies visibility rules.
 
-5\. System returns the product.
+5. System returns the product.
 
 
 
-\## Rules
+## Rules
 
 
 
@@ -416,19 +416,11 @@ Product Managers and Administrators may retrieve products in any state.
 
 
 
-\## Failure Scenarios
+## Failure Scenarios
 
 
 
-\### Product does not exist
-
-
-
-Return not-found response.
-
-
-
-\### Customer requests inactive product
+### Product does not exist
 
 
 
@@ -436,15 +428,23 @@ Return not-found response.
 
 
 
-\---
+### Customer requests inactive product
 
 
 
-\# 6. UC-003 List Products
+Return not-found response.
 
 
 
-\## Actor
+---
+
+
+
+# 6. UC-003 List Products
+
+
+
+## Actor
 
 
 
@@ -452,7 +452,7 @@ Customer / Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -460,7 +460,7 @@ Returns a paginated list of products.
 
 
 
-\## Supported Parameters
+## Supported Parameters
 
 
 
@@ -482,7 +482,7 @@ brand
 
 
 
-\## Customer Behavior
+## Customer Behavior
 
 
 
@@ -490,7 +490,7 @@ Customers receive only active products.
 
 
 
-\## Administrative Behavior
+## Administrative Behavior
 
 
 
@@ -498,7 +498,7 @@ Authorized internal users may request products in any state.
 
 
 
-\## Pagination
+## Pagination
 
 
 
@@ -512,21 +512,21 @@ Example:
 
 ```text
 
-GET /api/v1/products?page=0\&size=20
+GET /api/v1/products?page=0&size=20
 
 ```
 
 
 
-\---
+---
 
 
 
-\# 7. UC-004 Search Products
+# 7. UC-004 Search Products
 
 
 
-\## Actor
+## Actor
 
 
 
@@ -534,7 +534,7 @@ Customer / Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -542,21 +542,21 @@ Searches for products matching supplied criteria.
 
 
 
-\## Initial Search Fields
+## Initial Search Fields
 
 
 
-\* Name
+* Name
 
-\* SKU
+* SKU
 
-\* Category
+* Category
 
-\* Brand
+* Brand
 
 
 
-\## Customer Behavior
+## Customer Behavior
 
 
 
@@ -564,7 +564,7 @@ Only active products are searchable by customers.
 
 
 
-\## Future Enhancement
+## Future Enhancement
 
 
 
@@ -572,15 +572,15 @@ Advanced product search may be implemented using a dedicated search engine.
 
 
 
-\---
+---
 
 
 
-\# 8. UC-005 Update Product
+# 8. UC-005 Update Product
 
 
 
-\## Actor
+## Actor
 
 
 
@@ -588,7 +588,7 @@ Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -596,29 +596,29 @@ Updates product information.
 
 
 
-\## Main Flow
+## Main Flow
 
 
 
-1\. User sends product ID.
+1. User sends product ID.
 
-2\. System retrieves the product.
+2. System retrieves the product.
 
-3\. System validates the request.
+3. System validates the request.
 
-4\. System checks version.
+4. System checks version.
 
-5\. System updates the product.
+5. System updates the product.
 
-6\. System increments the version.
+6. System increments the version.
 
-7\. System stores the changes.
+7. System stores the changes.
 
-8\. System returns the updated product.
+8. System returns the updated product.
 
 
 
-\## Concurrency
+## Concurrency
 
 
 
@@ -630,15 +630,15 @@ If the supplied version is stale, the system shall reject the update.
 
 
 
-\---
+---
 
 
 
-\# 9. UC-006 Activate Product
+# 9. UC-006 Activate Product
 
 
 
-\## Actor
+## Actor
 
 
 
@@ -646,7 +646,7 @@ Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -654,7 +654,7 @@ Activates a product.
 
 
 
-\## Preconditions
+## Preconditions
 
 
 
@@ -662,7 +662,7 @@ The product must contain all mandatory information.
 
 
 
-\## Valid Transition
+## Valid Transition
 
 
 
@@ -686,35 +686,35 @@ INACTIVE → ACTIVE
 
 
 
-\## Main Flow
+## Main Flow
 
 
 
-1\. User requests activation.
+1. User requests activation.
 
-2\. System retrieves the product.
+2. System retrieves the product.
 
-3\. System validates product completeness.
+3. System validates product completeness.
 
-4\. System validates current state.
+4. System validates current state.
 
-5\. System changes status to `ACTIVE`.
+5. System changes status to `ACTIVE`.
 
-6\. System persists the change.
+6. System persists the change.
 
-7\. System publishes a product activation event.
-
-
-
-\---
+7. System publishes a product activation event.
 
 
 
-\# 10. UC-007 Deactivate Product
+---
 
 
 
-\## Actor
+# 10. UC-007 Deactivate Product
+
+
+
+## Actor
 
 
 
@@ -722,7 +722,7 @@ Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -730,7 +730,7 @@ Temporarily removes a product from customer visibility.
 
 
 
-\## Valid Transition
+## Valid Transition
 
 
 
@@ -742,33 +742,33 @@ ACTIVE → INACTIVE
 
 
 
-\## Main Flow
+## Main Flow
 
 
 
-1\. User requests deactivation.
+1. User requests deactivation.
 
-2\. System retrieves the product.
+2. System retrieves the product.
 
-3\. System validates current state.
+3. System validates current state.
 
-4\. System changes status.
+4. System changes status.
 
-5\. System persists the change.
+5. System persists the change.
 
-6\. System publishes a product deactivation event.
-
-
-
-\---
+6. System publishes a product deactivation event.
 
 
 
-\# 11. UC-008 Archive Product
+---
 
 
 
-\## Actor
+# 11. UC-008 Archive Product
+
+
+
+## Actor
 
 
 
@@ -776,7 +776,7 @@ Product Manager / Administrator
 
 
 
-\## Description
+## Description
 
 
 
@@ -784,7 +784,7 @@ Permanently removes a product from normal catalog operations.
 
 
 
-\## Valid Transition
+## Valid Transition
 
 
 
@@ -796,7 +796,7 @@ INACTIVE → ARCHIVED
 
 
 
-\## Rules
+## Rules
 
 
 
@@ -804,25 +804,25 @@ An archived product:
 
 
 
-\* Cannot be purchased.
+* Cannot be purchased.
 
-\* Cannot appear in customer listings.
+* Cannot appear in customer listings.
 
-\* Cannot be activated again.
+* Cannot be activated again.
 
-\* Must remain stored for audit/history purposes.
-
-
-
-\---
+* Must remain stored for audit/history purposes.
 
 
 
-\# 12. API Behavior
+---
 
 
 
-\## Create
+# 12. API Behavior
+
+
+
+## Create
 
 
 
@@ -834,7 +834,7 @@ POST /api/v1/products
 
 
 
-\## Get
+## Get
 
 
 
@@ -846,7 +846,7 @@ GET /api/v1/products/{id}
 
 
 
-\## List
+## List
 
 
 
@@ -858,7 +858,7 @@ GET /api/v1/products
 
 
 
-\## Update
+## Update
 
 
 
@@ -870,7 +870,7 @@ PUT /api/v1/products/{id}
 
 
 
-\## Activate
+## Activate
 
 
 
@@ -882,7 +882,7 @@ PATCH /api/v1/products/{id}/activate
 
 
 
-\## Deactivate
+## Deactivate
 
 
 
@@ -894,7 +894,7 @@ PATCH /api/v1/products/{id}/deactivate
 
 
 
-\## Archive
+## Archive
 
 
 
@@ -906,11 +906,11 @@ PATCH /api/v1/products/{id}/archive
 
 
 
-\---
+---
 
 
 
-\# 13. Validation
+# 13. Validation
 
 
 
@@ -918,77 +918,77 @@ The system must validate:
 
 
 
-\## SKU
+## SKU
 
 
 
-\* Required
+* Required
 
-\* Unique
+* Unique
 
-\* Maximum length to be defined during API design
-
-
-
-\## Name
+* Maximum length to be defined during API design
 
 
 
-\* Required
-
-\* Must not be blank
+## Name
 
 
 
-\## Description
+* Required
+
+* Must not be blank
 
 
 
-\* Required
-
-\* Must not be blank
+## Description
 
 
 
-\## Price
+* Required
+
+* Must not be blank
 
 
 
-\* Must be greater than or equal to zero
+## Price
 
 
 
-\## Currency
+* Must be greater than or equal to zero
 
 
 
-\* Required
-
-\* Must be a supported ISO currency code
+## Currency
 
 
 
-\## Category
+* Required
+
+* Must be a supported ISO currency code
 
 
 
-\* Required
+## Category
 
 
 
-\## Brand
+* Required
 
 
 
-\* Required
+## Brand
 
 
 
-\---
+* Required
 
 
 
-\# 14. Error Handling
+---
+
+
+
+# 14. Error Handling
 
 
 
@@ -1004,7 +1004,7 @@ Example:
 
 {
 
-&#x20; "code": "PRODUCT\_NOT\_FOUND",
+&#x20; "code": "PRODUCT_NOT_FOUND",
 
 &#x20; "message": "Product was not found",
 
@@ -1022,11 +1022,11 @@ Detailed error contract will be defined during API design.
 
 
 
-\---
+---
 
 
 
-\# 15. Idempotency
+# 15. Idempotency
 
 
 
@@ -1042,11 +1042,11 @@ For state transitions, repeating an already completed operation should return a 
 
 
 
-\---
+---
 
 
 
-\# 16. Concurrency
+# 16. Concurrency
 
 
 
@@ -1066,7 +1066,7 @@ Conceptually:
 
 Product
 
-\--------
+--------
 
 id
 
@@ -1086,11 +1086,11 @@ If the database version differs, the update must fail.
 
 
 
-\---
+---
 
 
 
-\# 17. Events
+# 17. Events
 
 
 
@@ -1122,11 +1122,11 @@ The exact event schemas will be defined during the event/API design phase.
 
 
 
-\---
+---
 
 
 
-\# 18. Auditability
+# 18. Auditability
 
 
 
@@ -1134,11 +1134,11 @@ The system should retain:
 
 
 
-\* Created timestamp
+* Created timestamp
 
-\* Updated timestamp
+* Updated timestamp
 
-\* Version
+* Version
 
 
 
@@ -1146,11 +1146,11 @@ A more complete audit history may be introduced later.
 
 
 
-\---
+---
 
 
 
-\# 19. Security
+# 19. Security
 
 
 
@@ -1194,11 +1194,11 @@ Administrator
 
 
 
-\---
+---
 
 
 
-\# 20. Performance
+# 20. Performance
 
 
 
@@ -1224,11 +1224,11 @@ These targets will be validated using performance testing.
 
 
 
-\---
+---
 
 
 
-\# 21. Availability
+# 21. Availability
 
 
 
@@ -1264,11 +1264,11 @@ Multiple instances must be able to run concurrently.
 
 
 
-\---
+---
 
 
 
-\# 22. Observability
+# 22. Observability
 
 
 
@@ -1276,13 +1276,13 @@ The service must provide:
 
 
 
-\* Health endpoint
+* Health endpoint
 
-\* Application logs
+* Application logs
 
-\* Metrics
+* Metrics
 
-\* Distributed tracing
+* Distributed tracing
 
 
 
@@ -1290,11 +1290,11 @@ The exact observability stack will be selected during HLD.
 
 
 
-\---
+---
 
 
 
-\# 23. Out of Scope
+# 23. Out of Scope
 
 
 
@@ -1302,31 +1302,31 @@ The following are not part of the initial Product Service implementation:
 
 
 
-\* Payments
+* Payments
 
-\* Orders
+* Orders
 
-\* Inventory
+* Inventory
 
-\* Shopping cart
+* Shopping cart
 
-\* Reviews
+* Reviews
 
-\* Recommendations
+* Recommendations
 
-\* Product images
+* Product images
 
-\* Advanced search infrastructure
+* Advanced search infrastructure
 
-\* Customer authentication implementation
-
-
-
-\---
+* Customer authentication implementation
 
 
 
-\# 24. Acceptance Criteria
+---
+
+
+
+# 24. Acceptance Criteria
 
 
 
@@ -1334,33 +1334,33 @@ The Product Service implementation is functionally acceptable when:
 
 
 
-1\. Authorized users can create products.
+1. Authorized users can create products.
 
-2\. Duplicate SKUs are rejected.
+2. Duplicate SKUs are rejected.
 
-3\. Products start in `DRAFT`.
+3. Products start in `DRAFT`.
 
-4\. Customers can retrieve active products.
+4. Customers can retrieve active products.
 
-5\. Customers cannot retrieve inactive products.
+5. Customers cannot retrieve inactive products.
 
-6\. Products can be updated.
+6. Products can be updated.
 
-7\. Concurrent updates are protected.
+7. Concurrent updates are protected.
 
-8\. Products can transition through valid lifecycle states.
+8. Products can transition through valid lifecycle states.
 
-9\. Invalid lifecycle transitions are rejected.
+9. Invalid lifecycle transitions are rejected.
 
-10\. Archived products cannot be reactivated.
+10. Archived products cannot be reactivated.
 
-11\. APIs provide consistent errors.
+11. APIs provide consistent errors.
 
-12\. Product changes can generate events.
+12. Product changes can generate events.
 
-13\. Product data remains persistent across application restarts.
+13. Product data remains persistent across application restarts.
 
-14\. Critical behavior is covered by automated tests.
+14. Critical behavior is covered by automated tests.
 
 
 
@@ -1368,11 +1368,11 @@ The Product Service implementation is functionally acceptable when:
 
 
 
-\---
+---
 
 
 
-\# 3. Something important we just introduced
+# 3. Something important we just introduced
 
 
 
@@ -1380,7 +1380,7 @@ There are several concepts here that we'll deliberately explore rather than just
 
 
 
-\### Optimistic locking
+### Optimistic locking
 
 
 
@@ -1422,7 +1422,7 @@ without silently losing updates.
 
 
 
-\### Idempotency
+### Idempotency
 
 
 
@@ -1444,7 +1444,7 @@ Distributed systems
 
 
 
-\### Stateless services
+### Stateless services
 
 
 
@@ -1472,19 +1472,19 @@ without requiring sticky sessions.
 
 
 
-\---
+---
 
 
 
-\# 4. Don't commit yet
+# 4. Don't commit yet
 
 
 
-Save the file, but \*\*don't commit it yet\*\*.
+Save the file, but **don't commit it yet**.
 
 
 
-There's one thing I want us to do next: \*\*review the FRD together and identify any business/design decisions that need to be changed before we freeze it.\*\*
+There's one thing I want us to do next: **review the FRD together and identify any business/design decisions that need to be changed before we freeze it.**
 
 
 
@@ -1524,7 +1524,7 @@ That's exactly the sort of reasoning you should learn as part of this exercise.
 
 
 
-\*\*Next step: we'll review the state machine and the product domain model before moving to HLD.\*\*
+**Next step: we'll review the state machine and the product domain model before moving to HLD.**
 
 
 
