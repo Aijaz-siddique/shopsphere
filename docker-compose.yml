@@ -1,0 +1,105 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: shopsphere-postgres
+    environment:
+      POSTGRES_DB: shopsphere
+      POSTGRES_USER: shopsphere
+      POSTGRES_PASSWORD: shopsphere_dev_password
+      TZ: Asia/Kolkata
+    ports:
+      - "5432:5432"
+    volumes:
+      - docker_postgres_data:/var/lib/postgresql/data
+    networks:
+      - shopsphere-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shopsphere -d shopsphere"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  product-service:
+    build:
+      context: ./product-service
+    container_name: shopsphere-product-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Asia/Kolkata
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shopsphere-network
+
+  order-service:
+    build:
+      context: ./order-service
+    container_name: shopsphere-order-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Asia/Kolkata
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shopsphere-network
+
+  customer-service:
+    build:
+      context: ./customer-service
+    container_name: shopsphere-customer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Asia/Kolkata
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shopsphere-network
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+    container_name: shopsphere-inventory-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Asia/Kolkata
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shopsphere-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: shopsphere-api-gateway
+    environment:
+      TZ: Asia/Kolkata
+    ports:
+      - "8090:8090"
+    depends_on:
+      - product-service
+      - order-service
+      - customer-service
+      - inventory-service
+    networks:
+      - shopsphere-network
+
+volumes:
+  docker_postgres_data:
+    external: true
+
+networks:
+  shopsphere-network:
+    driver: bridge
