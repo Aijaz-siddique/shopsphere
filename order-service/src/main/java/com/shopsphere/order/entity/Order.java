@@ -21,6 +21,12 @@ public class Order {
     @Column(name = "customer_id", nullable = false)
     private Long customerId;
 
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
+    @Column(nullable = false)
+    private Integer quantity;
+
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal totalAmount;
 
@@ -38,12 +44,16 @@ public class Order {
 
     public Order(
             Long customerId,
+            Long productId,
+            Integer quantity,
             BigDecimal totalAmount,
             String status,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
 
         this.customerId = customerId;
+        this.productId = productId;
+        this.quantity = quantity;
         this.totalAmount = totalAmount;
         this.status = status;
         this.createdAt = createdAt;
@@ -60,6 +70,22 @@ public class Order {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public BigDecimal getTotalAmount() {

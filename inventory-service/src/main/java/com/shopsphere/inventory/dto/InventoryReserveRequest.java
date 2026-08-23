@@ -1,12 +1,9 @@
-package com.shopsphere.order.dto;
+package com.shopsphere.inventory.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public record OrderRequest(
-
-        @NotNull(message = "Customer ID is required")
-        Long customerId,
+public record InventoryReserveRequest(
 
         @NotNull(message = "Product ID is required")
         Long productId,

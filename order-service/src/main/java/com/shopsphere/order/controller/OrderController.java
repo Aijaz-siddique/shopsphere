@@ -34,14 +34,18 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
 
-        return ResponseEntity.ok(orderService.getAllOrders());
+        return ResponseEntity.ok(
+                orderService.getAllOrders()
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(
             @PathVariable Long id) {
 
-        return ResponseEntity.ok(orderService.getOrderById(id));
+        return ResponseEntity.ok(
+                orderService.getOrderById(id)
+        );
     }
 
     @PutMapping("/{id}")

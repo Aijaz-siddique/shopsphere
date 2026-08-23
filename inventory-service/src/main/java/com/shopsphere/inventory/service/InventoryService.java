@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.shopsphere.inventory.dto.InventoryAvailabilityResponse;
+import com.shopsphere.inventory.dto.InventoryQuantityRequest;
 import com.shopsphere.inventory.dto.InventoryRequest;
 import com.shopsphere.inventory.dto.InventoryResponse;
 import com.shopsphere.inventory.entity.Inventory;
@@ -66,6 +69,29 @@ public class InventoryService {
         return toResponse(inventory);
     }
 
+    public InventoryAvailabilityResponse getAvailability(Long productId) {
+
+        Inventory inventory = inventoryRepository
+                .findByProductId(productId)
+                .orElseThrow(() ->
+                        new InventoryNotFoundException(productId)
+                );
+
+        Integer availableQuantity = inventory.getAvailableQuantity();
+        Integer reservedQuantity = inventory.getReservedQuantity();
+
+        Integer totalQuantity =
+                availableQuantity + reservedQuantity;
+
+        return new InventoryAvailabilityResponse(
+                inventory.getProductId(),
+                availableQuantity,
+                reservedQuantity,
+                totalQuantity,
+                availableQuantity > 0
+        );
+    }
+
     public InventoryResponse updateInventory(
             Long id,
             InventoryRequest request) {
@@ -78,6 +104,74 @@ public class InventoryService {
         inventory.setProductId(request.productId());
         inventory.setAvailableQuantity(request.availableQuantity());
         inventory.setReservedQuantity(request.reservedQuantity());
+        inventory.setUpdatedAt(LocalDateTime.now());
+
+        Inventory updatedInventory =
+                inventoryRepository.save(inventory);
+
+        return toResponse(updatedInventory);
+    }
+
+    @Transactional
+    public InventoryResponse reserveInventory(
+            Long id,
+            InventoryQuantityRequest request) {
+
+        Inventory inventory = inventoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new InventoryNotFoundException(id)
+                );
+
+        int quantity = request.quantity();
+
+        if (inventory.getAvailableQuantity() < quantity) {
+            throw new IllegalArgumentException(
+                    "Insufficient available inventory"
+            );
+        }
+
+        inventory.setAvailableQuantity(
+                inventory.getAvailableQuantity() - quantity
+        );
+
+        inventory.setReservedQuantity(
+                inventory.getReservedQuantity() + quantity
+        );
+
+        inventory.setUpdatedAt(LocalDateTime.now());
+
+        Inventory updatedInventory =
+                inventoryRepository.save(inventory);
+
+        return toResponse(updatedInventory);
+    }
+
+    @Transactional
+    public InventoryResponse releaseInventory(
+            Long id,
+            InventoryQuantityRequest request) {
+
+        Inventory inventory = inventoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new InventoryNotFoundException(id)
+                );
+
+        int quantity = request.quantity();
+
+        if (inventory.getReservedQuantity() < quantity) {
+            throw new IllegalArgumentException(
+                    "Cannot release more inventory than reserved"
+            );
+        }
+
+        inventory.setReservedQuantity(
+                inventory.getReservedQuantity() - quantity
+        );
+
+        inventory.setAvailableQuantity(
+                inventory.getAvailableQuantity() + quantity
+        );
+
         inventory.setUpdatedAt(LocalDateTime.now());
 
         Inventory updatedInventory =

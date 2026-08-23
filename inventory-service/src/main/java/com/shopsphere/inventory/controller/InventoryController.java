@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.shopsphere.inventory.dto.InventoryAvailabilityResponse;
+import com.shopsphere.inventory.dto.InventoryQuantityRequest;
 import com.shopsphere.inventory.dto.InventoryRequest;
 import com.shopsphere.inventory.dto.InventoryResponse;
 import com.shopsphere.inventory.service.InventoryService;
@@ -54,6 +56,35 @@ public class InventoryController {
 
         return ResponseEntity.ok(
                 inventoryService.getInventoryByProductId(productId)
+        );
+    }
+
+    @GetMapping("/product/{productId}/availability")
+    public ResponseEntity<InventoryAvailabilityResponse> getAvailability(
+            @PathVariable Long productId) {
+
+        return ResponseEntity.ok(
+                inventoryService.getAvailability(productId)
+        );
+    }
+
+    @PostMapping("/{id}/reserve")
+    public ResponseEntity<InventoryResponse> reserveInventory(
+            @PathVariable Long id,
+            @Valid @RequestBody InventoryQuantityRequest request) {
+
+        return ResponseEntity.ok(
+                inventoryService.reserveInventory(id, request)
+        );
+    }
+
+    @PostMapping("/{id}/release")
+    public ResponseEntity<InventoryResponse> releaseInventory(
+            @PathVariable Long id,
+            @Valid @RequestBody InventoryQuantityRequest request) {
+
+        return ResponseEntity.ok(
+                inventoryService.releaseInventory(id, request)
         );
     }
 
