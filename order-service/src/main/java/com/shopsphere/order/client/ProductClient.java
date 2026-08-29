@@ -33,14 +33,10 @@ public class ProductClient {
                 .onStatus(
                         status -> status.isError(),
                         (request, response) -> {
-                            String message = response.getBody() != null
-                                    ? new String(response.getBody().readAllBytes())
-                                    : "Product service request failed";
-
                             throw new DownstreamServiceException(
                                     SERVICE_NAME,
                                     response.getStatusCode().value(),
-                                    message
+                                    response.getStatusText()
                             );
                         }
                 )
