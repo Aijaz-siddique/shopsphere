@@ -12,13 +12,12 @@ import com.shopsphere.order.client.ProductClient;
 import com.shopsphere.order.dto.OrderRequest;
 import com.shopsphere.order.dto.OrderResponse;
 import com.shopsphere.order.entity.Order;
+import com.shopsphere.order.entity.OrderStatus;
 import com.shopsphere.order.exception.OrderNotFoundException;
 import com.shopsphere.order.repository.OrderRepository;
 
 @Service
 public class OrderService {
-
-    private static final String STATUS_CREATED = "CREATED";
 
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
@@ -66,7 +65,7 @@ public class OrderService {
             order.setProductId(request.productId());
             order.setQuantity(request.quantity());
             order.setTotalAmount(totalAmount);
-            order.setStatus(STATUS_CREATED);
+            order.setStatus(OrderStatus.CREATED.name());
             order.setCreatedAt(now);
             order.setUpdatedAt(now);
 
