@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import com.shopsphere.order.exception.DownstreamServiceException;
+
 @Component
 public class ProductClient {
+
+    private static final String SERVICE_NAME = "product-service";
 
     private final RestClient restClient;
 
@@ -26,6 +30,20 @@ public class ProductClient {
                 .get()
                 .uri("/api/products/{id}", productId)
                 .retrieve()
+                .onStatus(
+                        status -> status.isError(),
+                        (request, response) -> {
+                            String message = response.getBody() != null
+                                    ? new String(response.getBody().readAllBytes())
+                                    : "Product service request failed";
+
+                            throw new DownstreamServiceException(
+                                    SERVICE_NAME,
+                                    response.getStatusCode().value(),
+                                    message
+                            );
+                        }
+                )
                 .body(ProductResponse.class);
     }
 
