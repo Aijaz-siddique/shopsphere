@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationErrorResponse handleValidationException(
+    public ApiErrorResponse handleValidationException(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
 
@@ -25,14 +25,12 @@ public class GlobalExceptionHandler {
 
         ex.getBindingResult()
                 .getFieldErrors()
-                .forEach(error ->
-                        errors.put(
-                                error.getField(),
-                                error.getDefaultMessage()
-                        )
-                );
+                .forEach(error -> errors.put(
+                        error.getField(),
+                        error.getDefaultMessage()
+                ));
 
-        return new ValidationErrorResponse(
+        return new ApiErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "VALIDATION_FAILED",
@@ -48,9 +46,8 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex,
             HttpServletRequest request) {
 
-        return new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
+        return error(
+                HttpStatus.BAD_REQUEST,
                 "BAD_REQUEST",
                 ex.getMessage(),
                 request.getRequestURI()
@@ -63,9 +60,8 @@ public class GlobalExceptionHandler {
             ProductNotFoundException ex,
             HttpServletRequest request) {
 
-        return new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
+        return error(
+                HttpStatus.NOT_FOUND,
                 "PRODUCT_NOT_FOUND",
                 ex.getMessage(),
                 request.getRequestURI()
@@ -78,12 +74,27 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        return new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+        return error(
+                HttpStatus.INTERNAL_SERVER_ERROR,
                 "INTERNAL_SERVER_ERROR",
                 "An unexpected error occurred",
                 request.getRequestURI()
+        );
+    }
+
+    private ApiErrorResponse error(
+            HttpStatus status,
+            String error,
+            String message,
+            String path) {
+
+        return new ApiErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                error,
+                message,
+                path,
+                Map.of()
         );
     }
 }
