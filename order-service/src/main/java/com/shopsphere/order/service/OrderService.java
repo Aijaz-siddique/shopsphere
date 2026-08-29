@@ -39,11 +39,9 @@ public class OrderService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // Verify product exists and obtain the current price.
         ProductClient.ProductResponse product =
                 productClient.getProduct(request.productId());
 
-        // Obtain inventory for the requested product.
         InventoryClient.InventoryResponse inventory =
                 inventoryClient.getInventoryByProductId(request.productId());
 
@@ -54,7 +52,6 @@ public class OrderService {
             );
         }
 
-        // Reserve inventory before creating the order.
         inventoryClient.reserveInventory(
                 inventory.getId(),
                 request.quantity()
@@ -73,13 +70,9 @@ public class OrderService {
             order.setCreatedAt(now);
             order.setUpdatedAt(now);
 
-            Order savedOrder = orderRepository.save(order);
-
-            return toResponse(savedOrder);
+            return toResponse(orderRepository.save(order));
 
         } catch (RuntimeException ex) {
-            // The database transaction cannot roll back a remote inventory call.
-            // Compensate by releasing the reservation if order persistence fails.
             try {
                 inventoryClient.releaseInventory(
                         inventory.getId(),
@@ -120,15 +113,18 @@ public class OrderService {
         ProductClient.ProductResponse product =
                 productClient.getProduct(request.productId());
 
+        Long oldProductId = order.getProductId();
+        Integer oldQuantity = order.getQuantity();
+
         boolean inventoryChanged =
-                !order.getProductId().equals(request.productId())
-                        || !order.getQuantity().equals(request.quantity());
+                !oldProductId.equals(request.productId())
+                        || !oldQuantity.equals(request.quantity());
 
         InventoryClient.InventoryResponse oldInventory = null;
         InventoryClient.InventoryResponse newInventory = null;
 
         if (inventoryChanged) {
-            oldInventory = inventoryClient.getInventoryByProductId(order.getProductId());
+            oldInventory = inventoryClient.getInventoryByProductId(oldProductId);
             newInventory = inventoryClient.getInventoryByProductId(request.productId());
 
             if (newInventory.getAvailableQuantity() < request.quantity()) {
@@ -140,7 +136,7 @@ public class OrderService {
 
             inventoryClient.releaseInventory(
                     oldInventory.getId(),
-                    order.getQuantity()
+                    oldQuantity
             );
 
             try {
@@ -149,11 +145,10 @@ public class OrderService {
                         request.quantity()
                 );
             } catch (RuntimeException ex) {
-                // Restore the original reservation if the new reservation fails.
                 try {
                     inventoryClient.reserveInventory(
                             oldInventory.getId(),
-                            order.getQuantity()
+                            oldQuantity
                     );
                 } catch (RuntimeException compensationException) {
                     ex.addSuppressed(compensationException);
@@ -183,7 +178,7 @@ public class OrderService {
                     );
                     inventoryClient.reserveInventory(
                             oldInventory.getId(),
-                            order.getQuantity()
+                            oldQuantity
                     );
                 } catch (RuntimeException compensationException) {
                     ex.addSuppressed(compensationException);
