@@ -18,6 +18,8 @@ import com.shopsphere.order.repository.OrderRepository;
 @Service
 public class OrderService {
 
+    private static final String STATUS_CREATED = "CREATED";
+
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
     private final InventoryClient inventoryClient;
@@ -37,17 +39,14 @@ public class OrderService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 1. Verify product exists and get its price
+        // Verify product exists and obtain the current price.
         ProductClient.ProductResponse product =
                 productClient.getProduct(request.productId());
 
-        // 2. Get inventory for the requested product
+        // Obtain inventory for the requested product.
         InventoryClient.InventoryResponse inventory =
-                inventoryClient.getInventoryByProductId(
-                        request.productId()
-                );
+                inventoryClient.getInventoryByProductId(request.productId());
 
-        // 3. Check inventory before attempting reservation
         if (inventory.getAvailableQuantity() < request.quantity()) {
             throw new IllegalArgumentException(
                     "Insufficient available inventory for product "
@@ -55,37 +54,43 @@ public class OrderService {
             );
         }
 
-        // 4. Reserve inventory
+        // Reserve inventory before creating the order.
         inventoryClient.reserveInventory(
                 inventory.getId(),
                 request.quantity()
         );
 
-        // 5. Calculate total order amount
-        BigDecimal totalAmount =
-                product.getPrice()
-                        .multiply(
-                                BigDecimal.valueOf(
-                                        request.quantity()
-                                )
-                        );
+        try {
+            BigDecimal totalAmount = product.getPrice()
+                    .multiply(BigDecimal.valueOf(request.quantity()));
 
-        // 6. Create order
-        Order order = new Order();
+            Order order = new Order();
+            order.setCustomerId(request.customerId());
+            order.setProductId(request.productId());
+            order.setQuantity(request.quantity());
+            order.setTotalAmount(totalAmount);
+            order.setStatus(STATUS_CREATED);
+            order.setCreatedAt(now);
+            order.setUpdatedAt(now);
 
-        order.setCustomerId(request.customerId());
-        order.setProductId(request.productId());
-        order.setQuantity(request.quantity());
-        order.setTotalAmount(totalAmount);
-        order.setStatus("CREATED");
-        order.setCreatedAt(now);
-        order.setUpdatedAt(now);
+            Order savedOrder = orderRepository.save(order);
 
-        // 7. Persist order
-        Order savedOrder =
-                orderRepository.save(order);
+            return toResponse(savedOrder);
 
-        return toResponse(savedOrder);
+        } catch (RuntimeException ex) {
+            // The database transaction cannot roll back a remote inventory call.
+            // Compensate by releasing the reservation if order persistence fails.
+            try {
+                inventoryClient.releaseInventory(
+                        inventory.getId(),
+                        request.quantity()
+                );
+            } catch (RuntimeException compensationException) {
+                ex.addSuppressed(compensationException);
+            }
+
+            throw ex;
+        }
     }
 
     public List<OrderResponse> getAllOrders() {
@@ -99,44 +104,94 @@ public class OrderService {
     public OrderResponse getOrderById(Long id) {
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() ->
-                        new OrderNotFoundException(id)
-                );
+                .orElseThrow(() -> new OrderNotFoundException(id));
 
         return toResponse(order);
     }
 
+    @Transactional
     public OrderResponse updateOrder(
             Long id,
             OrderRequest request) {
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() ->
-                        new OrderNotFoundException(id)
-                );
+                .orElseThrow(() -> new OrderNotFoundException(id));
 
-        // Verify product exists and get current price
         ProductClient.ProductResponse product =
                 productClient.getProduct(request.productId());
 
-        BigDecimal totalAmount =
-                product.getPrice()
-                        .multiply(
-                                BigDecimal.valueOf(
-                                        request.quantity()
-                                )
-                        );
+        boolean inventoryChanged =
+                !order.getProductId().equals(request.productId())
+                        || !order.getQuantity().equals(request.quantity());
 
-        order.setCustomerId(request.customerId());
-        order.setProductId(request.productId());
-        order.setQuantity(request.quantity());
-        order.setTotalAmount(totalAmount);
-        order.setUpdatedAt(LocalDateTime.now());
+        InventoryClient.InventoryResponse oldInventory = null;
+        InventoryClient.InventoryResponse newInventory = null;
 
-        Order updatedOrder =
-                orderRepository.save(order);
+        if (inventoryChanged) {
+            oldInventory = inventoryClient.getInventoryByProductId(order.getProductId());
+            newInventory = inventoryClient.getInventoryByProductId(request.productId());
 
-        return toResponse(updatedOrder);
+            if (newInventory.getAvailableQuantity() < request.quantity()) {
+                throw new IllegalArgumentException(
+                        "Insufficient available inventory for product "
+                                + request.productId()
+                );
+            }
+
+            inventoryClient.releaseInventory(
+                    oldInventory.getId(),
+                    order.getQuantity()
+            );
+
+            try {
+                inventoryClient.reserveInventory(
+                        newInventory.getId(),
+                        request.quantity()
+                );
+            } catch (RuntimeException ex) {
+                // Restore the original reservation if the new reservation fails.
+                try {
+                    inventoryClient.reserveInventory(
+                            oldInventory.getId(),
+                            order.getQuantity()
+                    );
+                } catch (RuntimeException compensationException) {
+                    ex.addSuppressed(compensationException);
+                }
+                throw ex;
+            }
+        }
+
+        try {
+            BigDecimal totalAmount = product.getPrice()
+                    .multiply(BigDecimal.valueOf(request.quantity()));
+
+            order.setCustomerId(request.customerId());
+            order.setProductId(request.productId());
+            order.setQuantity(request.quantity());
+            order.setTotalAmount(totalAmount);
+            order.setUpdatedAt(LocalDateTime.now());
+
+            return toResponse(orderRepository.save(order));
+
+        } catch (RuntimeException ex) {
+            if (inventoryChanged && newInventory != null && oldInventory != null) {
+                try {
+                    inventoryClient.releaseInventory(
+                            newInventory.getId(),
+                            request.quantity()
+                    );
+                    inventoryClient.reserveInventory(
+                            oldInventory.getId(),
+                            order.getQuantity()
+                    );
+                } catch (RuntimeException compensationException) {
+                    ex.addSuppressed(compensationException);
+                }
+            }
+
+            throw ex;
+        }
     }
 
     public void deleteOrder(Long id) {
