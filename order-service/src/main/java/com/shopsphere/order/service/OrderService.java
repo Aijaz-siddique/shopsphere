@@ -72,15 +72,7 @@ public class OrderService {
             return toResponse(orderRepository.save(order));
 
         } catch (RuntimeException ex) {
-            try {
-                inventoryClient.releaseInventory(
-                        inventory.getId(),
-                        request.quantity()
-                );
-            } catch (RuntimeException compensationException) {
-                ex.addSuppressed(compensationException);
-            }
-
+            compensateInventoryRelease(inventory.getId(), request.quantity(), ex);
             throw ex;
         }
     }
@@ -95,9 +87,7 @@ public class OrderService {
 
     public OrderResponse getOrderById(Long id) {
 
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
-
+        Order order = findOrder(id);
         return toResponse(order);
     }
 
@@ -106,8 +96,8 @@ public class OrderService {
             Long id,
             OrderRequest request) {
 
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
+        Order order = findOrder(id);
+        ensureMutable(order);
 
         ProductClient.ProductResponse product =
                 productClient.getProduct(request.productId());
@@ -144,14 +134,11 @@ public class OrderService {
                         request.quantity()
                 );
             } catch (RuntimeException ex) {
-                try {
-                    inventoryClient.reserveInventory(
-                            oldInventory.getId(),
-                            oldQuantity
-                    );
-                } catch (RuntimeException compensationException) {
-                    ex.addSuppressed(compensationException);
-                }
+                compensateInventoryReservation(
+                        oldInventory.getId(),
+                        oldQuantity,
+                        ex
+                );
                 throw ex;
             }
         }
@@ -183,18 +170,71 @@ public class OrderService {
                     ex.addSuppressed(compensationException);
                 }
             }
-
             throw ex;
         }
     }
 
-    public void deleteOrder(Long id) {
+    @Transactional
+    public OrderResponse confirmOrder(Long id) {
 
-        if (!orderRepository.existsById(id)) {
-            throw new OrderNotFoundException(id);
+        Order order = findOrder(id);
+
+        if (!OrderStatus.CREATED.name().equals(order.getStatus())) {
+            throw new IllegalStateException(
+                    "Only CREATED orders can be confirmed"
+            );
         }
 
-        orderRepository.deleteById(id);
+        order.setStatus(OrderStatus.CONFIRMED.name());
+        order.setUpdatedAt(LocalDateTime.now());
+
+        return toResponse(orderRepository.save(order));
+    }
+
+    public void deleteOrder(Long id) {
+
+        Order order = findOrder(id);
+        ensureMutable(order);
+        orderRepository.delete(order);
+    }
+
+    private Order findOrder(Long id) {
+
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+    }
+
+    private void ensureMutable(Order order) {
+
+        if (!OrderStatus.CREATED.name().equals(order.getStatus())) {
+            throw new IllegalStateException(
+                    "Only CREATED orders can be modified"
+            );
+        }
+    }
+
+    private void compensateInventoryRelease(
+            Long inventoryId,
+            Integer quantity,
+            RuntimeException originalException) {
+
+        try {
+            inventoryClient.releaseInventory(inventoryId, quantity);
+        } catch (RuntimeException compensationException) {
+            originalException.addSuppressed(compensationException);
+        }
+    }
+
+    private void compensateInventoryReservation(
+            Long inventoryId,
+            Integer quantity,
+            RuntimeException originalException) {
+
+        try {
+            inventoryClient.reserveInventory(inventoryId, quantity);
+        } catch (RuntimeException compensationException) {
+            originalException.addSuppressed(compensationException);
+        }
     }
 
     private OrderResponse toResponse(Order order) {
