@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import com.shopsphere.order.exception.DownstreamServiceException;
 
@@ -26,18 +27,28 @@ public class InventoryClient {
 
     public InventoryResponse getInventoryByProductId(Long productId) {
 
-        return restClient
-                .get()
-                .uri("/api/inventory/product/{productId}", productId)
-                .retrieve()
-                .onStatus(
-                        status -> status.isError(),
-                        (request, response) -> throwDownstreamException(
-                                "Inventory lookup failed",
-                                response
-                        )
-                )
-                .body(InventoryResponse.class);
+        try {
+            return restClient
+                    .get()
+                    .uri("/api/inventory/product/{productId}", productId)
+                    .retrieve()
+                    .onStatus(
+                            status -> status.isError(),
+                            (request, response) -> throwDownstreamException(
+                                    "Inventory lookup failed",
+                                    response
+                            )
+                    )
+                    .body(InventoryResponse.class);
+        } catch (DownstreamServiceException ex) {
+            throw ex;
+        } catch (RestClientException ex) {
+            throw new DownstreamServiceException(
+                    SERVICE_NAME,
+                    503,
+                    "Inventory service is unavailable"
+            );
+        }
     }
 
     public InventoryResponse reserveInventory(
@@ -73,19 +84,29 @@ public class InventoryClient {
         InventoryQuantityRequest request =
                 new InventoryQuantityRequest(quantity);
 
-        return restClient
-                .post()
-                .uri(uri, inventoryId)
-                .body(request)
-                .retrieve()
-                .onStatus(
-                        status -> status.isError(),
-                        (requestMessage, response) -> throwDownstreamException(
-                                failureMessage,
-                                response
-                        )
-                )
-                .body(InventoryResponse.class);
+        try {
+            return restClient
+                    .post()
+                    .uri(uri, inventoryId)
+                    .body(request)
+                    .retrieve()
+                    .onStatus(
+                            status -> status.isError(),
+                            (requestMessage, response) -> throwDownstreamException(
+                                    failureMessage,
+                                    response
+                            )
+                    )
+                    .body(InventoryResponse.class);
+        } catch (DownstreamServiceException ex) {
+            throw ex;
+        } catch (RestClientException ex) {
+            throw new DownstreamServiceException(
+                    SERVICE_NAME,
+                    503,
+                    "Inventory service is unavailable"
+            );
+        }
     }
 
     private void throwDownstreamException(
