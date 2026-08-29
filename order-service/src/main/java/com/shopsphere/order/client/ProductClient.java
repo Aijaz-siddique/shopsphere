@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import com.shopsphere.order.exception.DownstreamServiceException;
 
@@ -26,21 +27,32 @@ public class ProductClient {
 
     public ProductResponse getProduct(Long productId) {
 
-        return restClient
-                .get()
-                .uri("/api/products/{id}", productId)
-                .retrieve()
-                .onStatus(
-                        status -> status.isError(),
-                        (request, response) -> {
-                            throw new DownstreamServiceException(
-                                    SERVICE_NAME,
-                                    response.getStatusCode().value(),
-                                    response.getStatusText()
-                            );
-                        }
-                )
-                .body(ProductResponse.class);
+        try {
+            return restClient
+                    .get()
+                    .uri("/api/products/{id}", productId)
+                    .retrieve()
+                    .onStatus(
+                            status -> status.isError(),
+                            (request, response) -> {
+                                throw new DownstreamServiceException(
+                                        SERVICE_NAME,
+                                        response.getStatusCode().value(),
+                                        "Product service returned "
+                                                + response.getStatusCode().value()
+                                );
+                            }
+                    )
+                    .body(ProductResponse.class);
+        } catch (DownstreamServiceException ex) {
+            throw ex;
+        } catch (RestClientException ex) {
+            throw new DownstreamServiceException(
+                    SERVICE_NAME,
+                    503,
+                    "Product service is unavailable"
+            );
+        }
     }
 
     public static class ProductResponse {
