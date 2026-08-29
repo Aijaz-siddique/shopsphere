@@ -90,6 +90,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiErrorResponse handleIllegalStateException(
+            IllegalStateException ex,
+            HttpServletRequest request) {
+
+        return error(
+                HttpStatus.CONFLICT,
+                "INVALID_ORDER_STATE",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiErrorResponse handleGenericException(
