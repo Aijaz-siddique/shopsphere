@@ -34,18 +34,14 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
 
-        return ResponseEntity.ok(
-                orderService.getAllOrders()
-        );
+        return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(
             @PathVariable Long id) {
 
-        return ResponseEntity.ok(
-                orderService.getOrderById(id)
-        );
+        return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
     @PutMapping("/{id}")
@@ -53,9 +49,14 @@ public class OrderController {
             @PathVariable Long id,
             @Valid @RequestBody OrderRequest request) {
 
-        return ResponseEntity.ok(
-                orderService.updateOrder(id, request)
-        );
+        return ResponseEntity.ok(orderService.updateOrder(id, request));
+    }
+
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity<OrderResponse> confirmOrder(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(orderService.confirmOrder(id));
     }
 
     @DeleteMapping("/{id}")
