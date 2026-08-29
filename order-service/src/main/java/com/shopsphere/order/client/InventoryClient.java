@@ -1,5 +1,7 @@
 package com.shopsphere.order.client;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -88,7 +90,7 @@ public class InventoryClient {
 
     private void throwDownstreamException(
             String defaultMessage,
-            org.springframework.http.client.ClientHttpResponse response) {
+            org.springframework.http.client.ClientHttpResponse response) throws IOException {
 
         String message = response.getStatusText();
 
