@@ -25,19 +25,21 @@ public class InventoryService {
 
     public InventoryResponse createInventory(InventoryRequest request) {
 
+        validateQuantities(
+                request.availableQuantity(),
+                request.reservedQuantity()
+        );
+
         LocalDateTime now = LocalDateTime.now();
 
         Inventory inventory = new Inventory();
-
         inventory.setProductId(request.productId());
         inventory.setAvailableQuantity(request.availableQuantity());
         inventory.setReservedQuantity(request.reservedQuantity());
         inventory.setCreatedAt(now);
         inventory.setUpdatedAt(now);
 
-        Inventory savedInventory = inventoryRepository.save(inventory);
-
-        return toResponse(savedInventory);
+        return toResponse(inventoryRepository.save(inventory));
     }
 
     public List<InventoryResponse> getAllInventory() {
@@ -51,37 +53,27 @@ public class InventoryService {
     public InventoryResponse getInventoryById(Long id) {
 
         Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new InventoryNotFoundException(id)
-                );
+                .orElseThrow(() -> new InventoryNotFoundException(id));
 
         return toResponse(inventory);
     }
 
     public InventoryResponse getInventoryByProductId(Long productId) {
 
-        Inventory inventory = inventoryRepository
-                .findByProductId(productId)
-                .orElseThrow(() ->
-                        new InventoryNotFoundException(productId)
-                );
+        Inventory inventory = inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new InventoryNotFoundException(productId));
 
         return toResponse(inventory);
     }
 
     public InventoryAvailabilityResponse getAvailability(Long productId) {
 
-        Inventory inventory = inventoryRepository
-                .findByProductId(productId)
-                .orElseThrow(() ->
-                        new InventoryNotFoundException(productId)
-                );
+        Inventory inventory = inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new InventoryNotFoundException(productId));
 
-        Integer availableQuantity = inventory.getAvailableQuantity();
-        Integer reservedQuantity = inventory.getReservedQuantity();
-
-        Integer totalQuantity =
-                availableQuantity + reservedQuantity;
+        int availableQuantity = inventory.getAvailableQuantity();
+        int reservedQuantity = inventory.getReservedQuantity();
+        int totalQuantity = availableQuantity + reservedQuantity;
 
         return new InventoryAvailabilityResponse(
                 inventory.getProductId(),
@@ -96,20 +88,20 @@ public class InventoryService {
             Long id,
             InventoryRequest request) {
 
+        validateQuantities(
+                request.availableQuantity(),
+                request.reservedQuantity()
+        );
+
         Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new InventoryNotFoundException(id)
-                );
+                .orElseThrow(() -> new InventoryNotFoundException(id));
 
         inventory.setProductId(request.productId());
         inventory.setAvailableQuantity(request.availableQuantity());
         inventory.setReservedQuantity(request.reservedQuantity());
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        Inventory updatedInventory =
-                inventoryRepository.save(inventory);
-
-        return toResponse(updatedInventory);
+        return toResponse(inventoryRepository.save(inventory));
     }
 
     @Transactional
@@ -117,10 +109,8 @@ public class InventoryService {
             Long id,
             InventoryQuantityRequest request) {
 
-        Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new InventoryNotFoundException(id)
-                );
+        Inventory inventory = inventoryRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new InventoryNotFoundException(id));
 
         int quantity = request.quantity();
 
@@ -133,17 +123,12 @@ public class InventoryService {
         inventory.setAvailableQuantity(
                 inventory.getAvailableQuantity() - quantity
         );
-
         inventory.setReservedQuantity(
                 inventory.getReservedQuantity() + quantity
         );
-
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        Inventory updatedInventory =
-                inventoryRepository.save(inventory);
-
-        return toResponse(updatedInventory);
+        return toResponse(inventoryRepository.save(inventory));
     }
 
     @Transactional
@@ -151,10 +136,8 @@ public class InventoryService {
             Long id,
             InventoryQuantityRequest request) {
 
-        Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new InventoryNotFoundException(id)
-                );
+        Inventory inventory = inventoryRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new InventoryNotFoundException(id));
 
         int quantity = request.quantity();
 
@@ -167,17 +150,12 @@ public class InventoryService {
         inventory.setReservedQuantity(
                 inventory.getReservedQuantity() - quantity
         );
-
         inventory.setAvailableQuantity(
                 inventory.getAvailableQuantity() + quantity
         );
-
         inventory.setUpdatedAt(LocalDateTime.now());
 
-        Inventory updatedInventory =
-                inventoryRepository.save(inventory);
-
-        return toResponse(updatedInventory);
+        return toResponse(inventoryRepository.save(inventory));
     }
 
     public void deleteInventory(Long id) {
@@ -187,6 +165,17 @@ public class InventoryService {
         }
 
         inventoryRepository.deleteById(id);
+    }
+
+    private void validateQuantities(
+            Integer availableQuantity,
+            Integer reservedQuantity) {
+
+        if (availableQuantity < 0 || reservedQuantity < 0) {
+            throw new IllegalArgumentException(
+                    "Inventory quantities cannot be negative"
+            );
+        }
     }
 
     private InventoryResponse toResponse(Inventory inventory) {
